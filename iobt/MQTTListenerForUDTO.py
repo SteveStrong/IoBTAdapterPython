@@ -25,7 +25,10 @@ CLIENT_ID = "me" # what do we want to use?
 client = None  # MQTT client instance. See init_mqtt()  
 
 
-class MQTTtoIoBTWrapper:
+# this should puhlish what is found to RxPY
+# https://github.com/ReactiveX/RxPY
+
+class MQTTListenerForUDTO:
     
 
     def __init__(self):

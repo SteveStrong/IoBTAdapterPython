@@ -22,7 +22,7 @@ class UDTO_Base:
         now = datetime.now()
         self.timeStamp = now.isoformat()
         self.sourceGuid = sourceGUID
-        self.personId = "PAN1"
+        self.panId = "PAN1"
         self.override(properties)
 
 
