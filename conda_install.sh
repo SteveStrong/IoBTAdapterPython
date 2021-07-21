@@ -10,6 +10,7 @@ conda install -c conda-forge imutils
 conda install -c conda-forge r-signal
 
 conda install -c anaconda pandas
+conda install -c conda-forge rx
 
 # conda install -c conda-forge moviepy
 # conda install -c pytorch pytorchy
