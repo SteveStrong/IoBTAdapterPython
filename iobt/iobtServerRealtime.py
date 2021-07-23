@@ -1,14 +1,9 @@
-import json
-import os
-import sys
-import time
-import requests
 import logging
 
 from signalrcore.hub_connection_builder import HubConnectionBuilder
 
 
-from models.udto_message import UDTO_Position, UDTO_ChatMessage
+from .models.udto_message import UDTO_Position, UDTO_ChatMessage
 
 class ClientHubConnector:
     azureURL:str
