@@ -1,12 +1,15 @@
 import logging
+import sys
+from typing import Any
 
 from signalrcore.hub_connection_builder import HubConnectionBuilder
+from .models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
 
-
-from .models.udto_message import UDTO_Position, UDTO_ChatMessage
+_logger = logging.getLogger()
 
 class ClientHubConnector:
     azureURL:str
+    hub_connection: Any = None
 
 
     def __init__(self, url:str) -> None:
@@ -32,6 +35,22 @@ class ClientHubConnector:
             self.hub_connection.on("ChatMessage", self.handle_receive_message)
 
         self.hub_connection.start()  
+
+    def chatMessage(self, obj:UDTO_ChatMessage):
+        try:
+            _logger.debug(f"chatMessage obj={obj.message}")
+            self.hub_connection.send("ChatMessage", [obj])
+        except:
+            print(F"Error ${sys.exc_info()[0]}")
+            return []
+
+    def command(self, obj:UDTO_Command):
+        try:
+            _logger.debug(f"command obj={obj.message}")
+            self.hub_connection.send("Command", [obj])
+        except:
+            print(F"Error ${sys.exc_info()[0]}")
+            return []
 
     def handle_receive_message(self, payload):
         print(f"receive_message payload={payload}")

@@ -53,17 +53,17 @@ class UDTO_Command(UDTO_Base):
         super().__init__(properties)
 
 class Location(UDTO_Base):
-    lat: int
-    lng: int
-    alt: int
+    lat: float
+    lng: float
+    alt: float
 
     def __init__(self, properties):
         super().__init__(properties)
 
 class UDTO_Position(Location):
     user: str
-    speed: int
-    heading: int
+    speed: float
+    heading: float
 
     def __init__(self, properties):
         super().__init__(properties)
@@ -83,7 +83,7 @@ class UDTO_Observation(Location):
     user: str
     target: str
     isTarget=False
-    range: int
+    range: float
 
     def __init__(self, properties):
         self.uniqueGuid = f"{uuid.uuid4()}"
