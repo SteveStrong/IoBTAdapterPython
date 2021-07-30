@@ -1,7 +1,7 @@
 import sys
 import requests
 
-from .models.udto_message import UDTO_Position, UDTO_ChatMessage
+from models.udto_message import UDTO_Position, UDTO_ChatMessage
 
 
 class IobtServerRest:

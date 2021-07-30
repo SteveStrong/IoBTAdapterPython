@@ -1,9 +1,10 @@
 import logging
 import sys
 from typing import Any
+import time
 
 from signalrcore.hub_connection_builder import HubConnectionBuilder
-from .models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
+from models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
 
 _logger = logging.getLogger()
 
@@ -32,9 +33,11 @@ class ClientHubConnector:
                     "max_attempts": 5
                 }).build()
 
-            self.hub_connection.on("ChatMessage", self.handle_receive_message)
+            # self.hub_connection.on("ChatMessage", self.handle_receive_message)
 
         self.hub_connection.start()
+
+        time.sleep(1)
 
     def chatMessage(self, obj: UDTO_ChatMessage):
         try:
@@ -54,7 +57,7 @@ class ClientHubConnector:
 
     def position(self, obj: UDTO_Position):
         try:
-            _logger.debug(f"command obj={obj.message}")
+            #_logger.debug(f"command obj={obj.message}")
             self.hub_connection.send("Position", [obj])
         except:
             print(F"Error ${sys.exc_info()[0]}")
