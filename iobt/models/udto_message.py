@@ -12,19 +12,20 @@ class Objective(Enum):
     POSSIBLE_TARGET = 'POSSIBLE_TARGET'
     CONFIRMED_TARGET = 'CONFIRMED_TARGET'
 
+
 class UDTO_Base:
+    udtoTopic: str
     sourceGuid: str
     timeStamp: str
-    personId: str
-
+    panId: str
 
     def __init__(self, properties):
         now = datetime.now()
         self.timeStamp = now.isoformat()
         self.sourceGuid = sourceGUID
         self.panId = "PAN1"
+        self.udtoTopic = self.__class__.__name__
         self.override(properties)
-
 
     def toJSONString(self):
         return json.dumps(self, default=lambda o: o.__dict__)
@@ -32,17 +33,20 @@ class UDTO_Base:
     def toDICT(self):
         return self.__dict__
 
-    def override(self, properties = None):
+    def override(self, properties=None):
         if (properties is not None):
             for key in properties:
-                setattr(self, key, properties[key])    
+                setattr(self, key, properties[key])
+
 
 class UDTO_ChatMessage(UDTO_Base):
-    user: str
+    toUser: str
+    fromUser: str
     message: str
 
     def __init__(self, properties):
         super().__init__(properties)
+
 
 class UDTO_Command(UDTO_Base):
     targetGuid: str
@@ -52,6 +56,7 @@ class UDTO_Command(UDTO_Base):
     def __init__(self, properties):
         super().__init__(properties)
 
+
 class Location(UDTO_Base):
     lat: float
     lng: float
@@ -60,13 +65,11 @@ class Location(UDTO_Base):
     def __init__(self, properties):
         super().__init__(properties)
 
-class UDTO_Position(Location):
-    user: str
-    speed: float
-    heading: float
 
+class UDTO_Position(Location):
     def __init__(self, properties):
         super().__init__(properties)
+
 
 class UDTO_Objective(Location):
     uniqueGuid: str
@@ -78,11 +81,11 @@ class UDTO_Objective(Location):
         self.uniqueGuid = f"{uuid.uuid4()}"
         super().__init__(properties)
 
+
 class UDTO_Observation(Location):
     uniqueGuid: str
-    user: str
     target: str
-    isTarget=False
+    isTarget = False
     range: float
 
     def __init__(self, properties):

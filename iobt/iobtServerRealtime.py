@@ -7,12 +7,12 @@ from .models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
 
 _logger = logging.getLogger()
 
+
 class ClientHubConnector:
-    azureURL:str
+    azureURL: str
     hub_connection: Any = None
 
-
-    def __init__(self, url:str) -> None:
+    def __init__(self, url: str) -> None:
         self.azureURL = url
         self.initialize()
 
@@ -24,8 +24,8 @@ class ClientHubConnector:
         if (self.hub_connection is None):
             self.hub_connection = HubConnectionBuilder()\
                 .with_url(hubUrl)\
-                    .configure_logging(logging.DEBUG)\
-                    .with_automatic_reconnect({
+                .configure_logging(logging.DEBUG)\
+                .with_automatic_reconnect({
                     "type": "raw",
                     "keep_alive_interval": 60,
                     "reconnect_interval": 30,
@@ -34,9 +34,9 @@ class ClientHubConnector:
 
             self.hub_connection.on("ChatMessage", self.handle_receive_message)
 
-        self.hub_connection.start()  
+        self.hub_connection.start()
 
-    def chatMessage(self, obj:UDTO_ChatMessage):
+    def chatMessage(self, obj: UDTO_ChatMessage):
         try:
             _logger.debug(f"chatMessage obj={obj.message}")
             self.hub_connection.send("ChatMessage", [obj])
@@ -44,10 +44,18 @@ class ClientHubConnector:
             print(F"Error ${sys.exc_info()[0]}")
             return []
 
-    def command(self, obj:UDTO_Command):
+    def command(self, obj: UDTO_Command):
         try:
             _logger.debug(f"command obj={obj.message}")
             self.hub_connection.send("Command", [obj])
+        except:
+            print(F"Error ${sys.exc_info()[0]}")
+            return []
+
+    def position(self, obj: UDTO_Position):
+        try:
+            _logger.debug(f"command obj={obj.message}")
+            self.hub_connection.send("Position", [obj])
         except:
             print(F"Error ${sys.exc_info()[0]}")
             return []
@@ -61,4 +69,4 @@ class ClientHubConnector:
 
     def shutdown(self):
         if (self.hub_connection):
-            self.hub_connection.stop()      
+            self.hub_connection.stop()
