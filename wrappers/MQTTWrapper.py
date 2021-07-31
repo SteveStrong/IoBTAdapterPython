@@ -1,5 +1,7 @@
 from datetime import datetime
-from iobt.models.udto_message import UDTO_ChatMessage
+from iobtServerRealtime import ClientHubConnector
+from typing import Any
+from models.udto_message import UDTO_ChatMessage, UDTO_Command, UDTO_Position
 import json
 import os
 import sys
@@ -19,18 +21,21 @@ logger.setLevel(logging.INFO)  # Debugging for this file.
 # BROKER_HOST = "localhost"
 
 KEEPALIVE = 60
-BROKER_HOST = "demo.iobtlab.com"
-BROKER_PORT = 1883
-CLIENT_ID = "me"  # what do we want to use?
+# BROKER_HOST = "demo.iobtlab.com"
+# BROKER_PORT = 1883
+CLIENT_ID = "mqttToIoBTListener"  # what do we want to use?
 client = None  # MQTT client instance. See init_mqtt()
 
 
-# this should puhlish what is found to RxPY
-# https://github.com/ReactiveX/RxPY
+class MQTTtoIoBTWrapper:
+    iobt_hub: ClientHubConnector
+    message_dict: Any
 
-class MQTTListenerForUDTO:
+    def __init__(self, broker_host: str, broker_port: int):
+        self.build_message_dict()
+        self.broker_host = broker_host
+        self.broker_port = broker_port
 
-    def __init__(self):
         self.client = mqtt.Client(client_id=CLIENT_ID, clean_session=False)
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
@@ -38,31 +43,21 @@ class MQTTListenerForUDTO:
 
         self.message_count = 0
 
-        # Our MQTT Client. See PAHO documentation for all configurable options.
-        # "clean_session=True" means we don"t want Broker to retain QoS 1 and 2 messages
-        # for us when we"re offline. You"ll see the "{"session present": 0}" logged when
-        # connected.
-
-        # Route Paho logging to Python logging.
         self.client.enable_logger()
 
-        # Setup callbacks
-
-    def sendUDTO(self, topic, data):
-        if topic == "UDTO_ChatMessage":
-            payload = UDTO_ChatMessage(data)
-            self.client.publish(topic, payload)
-
-    def setCallback(self, call_me):
-        self.call_me = call_me
+    def build_message_dict(self):
+        self.message_dict = dict({
+            "iobt/udto/udto_chatmessage": self.process_chat,
+            "iobt/udto/udto_command": self.process_command,
+            "iobt/udto/udto_position": self.process_position
+        })
 
     def publish(self, topic, payload):
         self.client.publish(topic, payload)
 
     def start(self):
         # Connect to Broker.
-        self.client.connect(BROKER_HOST, BROKER_PORT)
-        # self.client.connect_async(BROKER_HOST, BROKER_PORT, KEEPALIVE)
+        self.client.connect(self.broker_host, self.broker_port)
 
     def do_loop(self):
         self.client.loop_start()
@@ -86,24 +81,30 @@ class MQTTListenerForUDTO:
                          mqtt.connack_string(connection_result_code))
 
         # Subscribe to the topic
-        client.subscribe('UDTO_ChatMessage', qos=2)
+        for key in self.message_dict.keys():
+            client.subscribe(key, qos=2)
 
     def on_disconnect(self, client, user_data, disconnection_result_code):
         """Called disconnects from MQTT Broker."""
         logger.error("Disconnected from MQTT Broker")
 
+    def process_chat(self, data: Any):
+        payload = UDTO_ChatMessage(data)
+        self.iobt_hub.chatMessage(payload)
+
+    def process_command(self, data: Any):
+        payload = UDTO_Command(data)
+        self.iobt_hub.command(payload)
+
+    def process_position(self, data: Any):    
+        payload = UDTO_Position(dict(data))
+        print(f'data {data}')
+        print(f'payload {payload}')
+        print(payload.lat)
+        self.iobt_hub.position(payload)
+
     def on_message(self, client, userdata, msg):
         """Callback called when a message is received on a subscribed topic."""
-        data = None
-
         topic = msg.topic
-        timestamp = msg.timestamp
-        if topic == "UDTO_ChatMessage":
-            payload = UDTO_ChatMessage(data)
-            payload.timeStamp = msg.timestamp
-
-        try:
-            self.call_me(msg)
-            data = json.loads(msg.payload.decode("UTF-8"))
-        except json.JSONDecodeError as e:
-            print("JSON Decode Error: " + msg.payload.decode("UTF-8"))
+        data = json.loads(msg.payload)
+        self.message_dict[topic](data)
