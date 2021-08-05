@@ -24,8 +24,8 @@ class UDTO_Base:
         self.timeStamp = now.isoformat()
         self.sourceGuid = sourceGUID
         self.panId = "PAN1"
-        self.udtoTopic = self.__class__.__name__
         self.override(properties)
+        self.setUdtoTopic()
 
     def toJSONString(self):
         return json.dumps(self, default=lambda o: o.__dict__)
@@ -37,6 +37,9 @@ class UDTO_Base:
         if (properties is not None):
             for key in properties:
                 setattr(self, key, properties[key])
+
+    def setUdtoTopic(self):
+        self.udtoTopic = self.__class__.__name__.replace("UDTO_", "")
 
 
 class UDTO_ChatMessage(UDTO_Base):

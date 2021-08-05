@@ -42,7 +42,7 @@ class ClientHubConnector:
     def chatMessage(self, obj: UDTO_ChatMessage):
         try:
             _logger.debug(f"chatMessage obj={obj.message}")
-            self.hub_connection.send("ChatMessage", [obj])
+            self.hub_connection.send(obj.udtoTopic, [obj])
         except:
             print(F"Error ${sys.exc_info()[0]}")
             return []
@@ -50,7 +50,7 @@ class ClientHubConnector:
     def command(self, obj: UDTO_Command):
         try:
             _logger.debug(f"command obj={obj.message}")
-            self.hub_connection.send("Command", [obj])
+            self.hub_connection.send(obj.udtoTopic, [obj])
         except:
             print(F"Error ${sys.exc_info()[0]}")
             return []
@@ -58,7 +58,7 @@ class ClientHubConnector:
     def position(self, obj: UDTO_Position):
         try:
             #_logger.debug(f"command obj={obj.message}")
-            self.hub_connection.send("Position", [obj])
+            self.hub_connection.send(obj.udtoTopic, [obj])
         except:
             print(F"Error ${sys.exc_info()[0]}")
             return []

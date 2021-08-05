@@ -49,7 +49,10 @@ class MQTTtoIoBTWrapper:
         self.message_dict = dict({
             "iobt/udto/udto_chatmessage": self.process_chat,
             "iobt/udto/udto_command": self.process_command,
-            "iobt/udto/udto_position": self.process_position
+            "iobt/udto/udto_position": self.process_position,
+            "iobt/udto/ChatMessage": self.process_chat,
+            "iobt/udto/Command": self.process_command,
+            "iobt/udto/Position": self.process_position
         })
 
     def publish(self, topic, payload):
@@ -96,7 +99,7 @@ class MQTTtoIoBTWrapper:
         payload = UDTO_Command(data)
         self.iobt_hub.command(payload)
 
-    def process_position(self, data: Any):    
+    def process_position(self, data: Any):
         payload = UDTO_Position(dict(data))
         print(f'data {data}')
         print(f'payload {payload}')
