@@ -12,11 +12,12 @@ class Objective(Enum):
     POSSIBLE_TARGET = 'POSSIBLE_TARGET'
     CONFIRMED_TARGET = 'CONFIRMED_TARGET'
 
+
 class UDTO_Base:
+    udtoTopic: str
     sourceGuid: str
     timeStamp: str
-    personId: str
-
+    panId: str
 
     def __init__(self, properties):
         now = datetime.now()
@@ -24,7 +25,7 @@ class UDTO_Base:
         self.sourceGuid = sourceGUID
         self.panId = "PAN1"
         self.override(properties)
-
+        self.setUdtoTopic()
 
     def toJSONString(self):
         return json.dumps(self, default=lambda o: o.__dict__)
@@ -32,17 +33,23 @@ class UDTO_Base:
     def toDICT(self):
         return self.__dict__
 
-    def override(self, properties = None):
+    def override(self, properties=None):
         if (properties is not None):
             for key in properties:
-                setattr(self, key, properties[key])    
+                setattr(self, key, properties[key])
+
+    def setUdtoTopic(self):
+        self.udtoTopic = self.__class__.__name__.replace("UDTO_", "")
+
 
 class UDTO_ChatMessage(UDTO_Base):
-    user: str
+    toUser: str
+    fromUser: str
     message: str
 
     def __init__(self, properties):
         super().__init__(properties)
+
 
 class UDTO_Command(UDTO_Base):
     targetGuid: str
@@ -52,21 +59,20 @@ class UDTO_Command(UDTO_Base):
     def __init__(self, properties):
         super().__init__(properties)
 
+
 class Location(UDTO_Base):
-    lat: int
-    lng: int
-    alt: int
+    lat: float
+    lng: float
+    alt: float
 
     def __init__(self, properties):
         super().__init__(properties)
+
 
 class UDTO_Position(Location):
-    user: str
-    speed: int
-    heading: int
-
     def __init__(self, properties):
         super().__init__(properties)
+
 
 class UDTO_Objective(Location):
     uniqueGuid: str
@@ -78,12 +84,12 @@ class UDTO_Objective(Location):
         self.uniqueGuid = f"{uuid.uuid4()}"
         super().__init__(properties)
 
+
 class UDTO_Observation(Location):
     uniqueGuid: str
-    user: str
     target: str
-    isTarget=False
-    range: int
+    isTarget = False
+    range: float
 
     def __init__(self, properties):
         self.uniqueGuid = f"{uuid.uuid4()}"
