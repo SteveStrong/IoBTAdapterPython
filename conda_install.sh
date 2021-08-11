@@ -1,6 +1,6 @@
 #!/bin/bash
 
-conda create -name iobt-adapter python=3.8
+conda create --name iobt-adapter python=3.8
 conda install -c conda-forge opencv
 conda install -c conda-forge paho-mqtt
 conda install -c conda-forge numpy
