@@ -1,7 +1,7 @@
 from datetime import datetime
-from iobtServerRealtime import ClientHubConnector
+from ..iobtServerRealtime import ClientHubConnector
 from typing import Any
-from models.udto_message import UDTO_ChatMessage, UDTO_Command, UDTO_Position
+from ..models.udto_message import UDTO_ChatMessage, UDTO_Command, UDTO_Position
 import json
 import os
 import sys
