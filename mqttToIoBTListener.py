@@ -1,7 +1,5 @@
 from wrappers.MQTTWrapper import MQTTtoIoBTWrapper
 from iobtServerRealtime import ClientHubConnector
-import sys
-import signal
 
 mqttBroker = "demo.iobtlab.com"
 username = "techworks"
@@ -9,10 +7,8 @@ password = "t3chw0rks"
 
 iobtBaseURL = "https://iobtweb.azurewebsites.net"
 
-def signal_handler(sig, frame):
-    sys.exit(0)   
 
-if __name__ == '__main__':
+def main():
     iobtHub = ClientHubConnector(iobtBaseURL)
 
     mqttHub = MQTTtoIoBTWrapper(mqttBroker, 1883)
@@ -22,4 +18,9 @@ if __name__ == '__main__':
 
     mqttHub.do_loop()
 
-    signal.pause()
+    # cross-platform way to pause python execution.  signal is not available in windows
+    input("Press the <Enter> key or <ctrl-C> to continue...")
+
+
+# if __name__ == '__main__':
+main()
