@@ -4,7 +4,7 @@ from typing import Any
 import time
 
 from signalrcore.hub_connection_builder import HubConnectionBuilder
-from models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
+from .models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
 
 _logger = logging.getLogger()
 
@@ -25,7 +25,7 @@ class ClientHubConnector:
         if (self.hub_connection is None):
             self.hub_connection = HubConnectionBuilder()\
                 .with_url(hubUrl)\
-                .configure_logging(logging.DEBUG)\
+                .configure_logging(logging.WARNING)\
                 .with_automatic_reconnect({
                     "type": "raw",
                     "keep_alive_interval": 60,
@@ -44,7 +44,7 @@ class ClientHubConnector:
             _logger.debug(f"chatMessage obj={obj.message}")
             self.hub_connection.send(obj.udtoTopic, [obj])
         except:
-            print(F"Error ${sys.exc_info()[0]}")
+            print(f"Error ${sys.exc_info()[0]}")
             return []
 
     def command(self, obj: UDTO_Command):
@@ -52,7 +52,7 @@ class ClientHubConnector:
             _logger.debug(f"command obj={obj.message}")
             self.hub_connection.send(obj.udtoTopic, [obj])
         except:
-            print(F"Error ${sys.exc_info()[0]}")
+            print(f"Error ${sys.exc_info()[0]}")
             return []
 
     def position(self, obj: UDTO_Position):
@@ -60,7 +60,7 @@ class ClientHubConnector:
             #_logger.debug(f"command obj={obj.message}")
             self.hub_connection.send(obj.udtoTopic, [obj])
         except:
-            print(F"Error ${sys.exc_info()[0]}")
+            print(f"Error ${sys.exc_info()[0]}")
             return []
 
     def handle_receive_message(self, payload):
