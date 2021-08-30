@@ -35,9 +35,23 @@ class ClientHubConnector:
 
             # self.hub_connection.on("ChatMessage", self.handle_receive_message)
 
-        self.hub_connection.start()
+    def start(self):
+        try:
+            self.hub_connection.start()
+            time.sleep(1)
+            self.hub_connection.on("Pong", self.print_pong)
+            self.hub_connection.on("Position", self.print_position)
+        except:
+            print(f"client hub connector exception")
+            raise
 
-        time.sleep(1)
+        # callback()
+
+    def print_pong(self, payload):
+        print(f"print_pong payload={payload}")
+
+    def print_position(self, payload):
+        print(f"print_position payload={payload}")
 
     def chatMessage(self, obj: UDTO_ChatMessage):
         try:
@@ -65,6 +79,9 @@ class ClientHubConnector:
 
     def handle_receive_message(self, payload):
         print(f"receive_message payload={payload}")
+
+    def handle_receive_ping(self, payload):
+        print(f"receive ping payload={payload}")
 
     def stop(self):
         if (self.hub_connection):
