@@ -16,14 +16,14 @@ iobtBaseURL = "https://iobtweb.azurewebsites.net"
 
 def main():
     print(f"Start of main")
-    # iobtHub = ClientHubConnector(iobtBaseURL)
-    # iobtHub.start()
+    iobtHub = ClientHubConnector(iobtBaseURL)
+    iobtHub.start()
 
-    # print(f"Started iobtHub")
+    print(f"Started iobtHub")
 
-    iobtRest = IobtServerRest(iobtBaseURL)
-    print(f"Started iobtRest")
-    iobtRest.ping()
+    # iobtRest = IobtServerRest(iobtBaseURL)
+    # print(f"Started iobtRest")
+    # iobtRest.ping()
 
     def end_of_processing(signal_number, stack_frame):
         print(f"Exiting")
