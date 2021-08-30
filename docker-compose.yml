@@ -1,0 +1,10 @@
+version: '3'
+services:
+  iobtserver:
+    image: iobtmesh417
+    ports:
+      - '8000:80'
+  iobt-bridge:
+    image: iobt-adapter-python
+    links:
+      - 'iobtserver'
