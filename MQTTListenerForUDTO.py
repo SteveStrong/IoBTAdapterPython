@@ -98,7 +98,7 @@ class MQTTListenerForUDTO:
 
         topic = msg.topic
         timestamp = msg.timestamp
-        if topic == "UDTO_ChatMessage":
+        if topic == "ChatMessage":
             payload = UDTO_ChatMessage(data)
             payload.timeStamp = msg.timestamp
 

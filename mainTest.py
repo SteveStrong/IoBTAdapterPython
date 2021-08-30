@@ -40,8 +40,8 @@ from iobt.MQTTWrapper import MQTTWrapper
 if __name__ == '__main__':
 
     
-    iobtURL = "http://localhost:5000"
-    //iobtURL = "https://iobtweb.azurewebsites.net"
+    #iobtURL = "http://localhost:5000"
+    iobtURL = "https://iobtweb.azurewebsites.net"
 
 
     # mqttHUB.topics({
