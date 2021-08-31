@@ -9,21 +9,22 @@ mqttBroker = "demo.iobtlab.com"
 username = "techworks"
 password = "t3chw0rks"
 
-iobtBaseURL = "https://iobtweb.azurewebsites.net"
+# iobtBaseURL = "https://iobtweb.azurewebsites.net"
+# iobtBaseURL = "http://localhost:8000"
+# iobtBaseURL = "http://0.0.0.0:8000"
 # iobtBaseURL = "http://127.0.0.1:8080"
-# iobtBaseURL = "http://iobtserver:8000"
+iobtBaseURL = "http://iobtserver:80"
 
 
 def main():
     print(f"Start of main")
     iobtHub = ClientHubConnector(iobtBaseURL)
     iobtHub.start()
-
     print(f"Started iobtHub")
 
-    # iobtRest = IobtServerRest(iobtBaseURL)
-    # print(f"Started iobtRest")
-    # iobtRest.ping()
+    iobtRest = IobtServerRest(iobtBaseURL)
+    print(f"Started iobtRest")
+    iobtRest.ping()
 
     def end_of_processing(signal_number, stack_frame):
         print(f"Exiting")
@@ -34,8 +35,6 @@ def main():
     while True:
         # TODO: is there a better way to constantly listen?
         time.sleep(0.1)
-
-    # input("\nPress the <Enter> key or <ctrl-C> to continue...\n\n")
 
 
 # if __name__ == '__main__':

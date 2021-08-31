@@ -6,7 +6,8 @@ import time
 from signalrcore.hub_connection_builder import HubConnectionBuilder
 from .models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
 
-_logger = logging.getLogger()
+logger = logging.getLogger('iobtServerRealtime')
+logger.setLevel(logging.DEBUG)  # set logger level
 
 
 class ClientHubConnector:
@@ -48,14 +49,16 @@ class ClientHubConnector:
         # callback()
 
     def print_pong(self, payload):
+        logger.debug(f"print_pong payload={payload}")
         print(f"print_pong payload={payload}")
 
     def print_position(self, payload):
+        logger.debug(f"print_position payload={payload}")
         print(f"print_position payload={payload}")
 
     def chatMessage(self, obj: UDTO_ChatMessage):
         try:
-            _logger.debug(f"chatMessage obj={obj.message}")
+            logger.debug(f"chatMessage obj={obj.message}")
             self.hub_connection.send(obj.udtoTopic, [obj])
         except:
             print(f"Error ${sys.exc_info()[0]}")
@@ -63,7 +66,7 @@ class ClientHubConnector:
 
     def command(self, obj: UDTO_Command):
         try:
-            _logger.debug(f"command obj={obj.message}")
+            logger.debug(f"command obj={obj.message}")
             self.hub_connection.send(obj.udtoTopic, [obj])
         except:
             print(f"Error ${sys.exc_info()[0]}")
@@ -71,7 +74,7 @@ class ClientHubConnector:
 
     def position(self, obj: UDTO_Position):
         try:
-            #_logger.debug(f"command obj={obj.message}")
+            #logger.debug(f"command obj={obj.message}")
             self.hub_connection.send(obj.udtoTopic, [obj])
         except:
             print(f"Error ${sys.exc_info()[0]}")

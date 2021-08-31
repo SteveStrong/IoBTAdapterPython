@@ -1,7 +1,10 @@
 import sys
 import requests
-
+import logging
 from .models.udto_message import UDTO_Position, UDTO_ChatMessage
+
+logger = logging.getLogger('iobtServerRest')
+logger.setLevel(logging.DEBUG)  # set logger level
 
 
 class IobtServerRest:
@@ -74,7 +77,9 @@ class IobtServerRest:
                            'Accept': 'application/json'})
 
             url = F"{self.azureURL}/api/ClientHub/Ping"
+            logger.debug(f"in ping before get url={url}")
             response = requests.get(url=url, headers=headers)
+            logger.debug(f"response.headers={response.headers}")
             print(response.headers)
 
             return response
