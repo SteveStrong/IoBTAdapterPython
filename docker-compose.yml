@@ -1,10 +1,17 @@
 version: '3'
 services:
-  iobtserver:
+  centralmodel:
     image: iobtmesh417
     ports:
       - '8000:80'
+  mqttbroker:
+    image: eclipse-mosquitto:latest
+    ports:
+      - '1883:1883'
   iobtbridge:
     image: iobt-adapter-python
+    depends_on:
+      - 'centralmodel'
     links:
-      - 'iobtserver:iobtserver'
+      - 'centralmodel:centralmodelapi'
+      - 'mqttbroker:mqttbrokerapi'
