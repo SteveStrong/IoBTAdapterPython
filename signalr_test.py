@@ -13,7 +13,7 @@ password = "t3chw0rks"
 # iobtBaseURL = "http://localhost:8000"
 # iobtBaseURL = "http://0.0.0.0:8000"
 # iobtBaseURL = "http://127.0.0.1:8080"
-iobtBaseURL = "http://iobtserver:80"
+iobtBaseURL = "http://iobtserver"
 
 
 def main():
