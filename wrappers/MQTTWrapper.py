@@ -12,9 +12,8 @@ import uuid
 import paho.mqtt.client as mqtt
 
 # Initialize Logging
-logging.basicConfig(level=logging.WARNING)  # Global logging configuration
-logger = logging.getLogger("main")  # Logger for this module
-logger.setLevel(logging.INFO)  # Debugging for this file.
+logger = logging.getLogger('iobtServerRealtime')
+logger.setLevel(logging.DEBUG)  # set logger level
 # Initialize Logging
 
 # Define some stuff
@@ -52,7 +51,8 @@ class MQTTtoIoBTWrapper:
             "iobt/udto/udto_position": self.process_position,
             "iobt/udto/ChatMessage": self.process_chat,
             "iobt/udto/Command": self.process_command,
-            "iobt/udto/Position": self.process_position
+            "iobt/udto/Position": self.process_position,
+            "iobt/udto/Ping": self.process_ping
         })
 
     def publish(self, topic, payload):
@@ -91,23 +91,31 @@ class MQTTtoIoBTWrapper:
         """Called disconnects from MQTT Broker."""
         logger.error("Disconnected from MQTT Broker")
 
-    def process_chat(self, data: Any):
+    def process_chat(self, msg: Any):
+        data = json.loads(msg.payload)
         payload = UDTO_ChatMessage(data)
         self.iobt_hub.chatMessage(payload)
 
-    def process_command(self, data: Any):
+    def process_command(self, msg: Any):
+        data = json.loads(msg.payload)
         payload = UDTO_Command(data)
         self.iobt_hub.command(payload)
 
-    def process_position(self, data: Any):
+    def process_position(self, msg: Any):
+        data = json.loads(msg.payload)
         payload = UDTO_Position(dict(data))
         print(f'data {data}')
         print(f'payload {payload}')
         print(payload.lat)
         self.iobt_hub.position(payload)
 
+    def process_ping(self, msg: Any):
+        logger.debug(f"mqtt process_ping payload={msg.payload}")
+        print(f"mqtt process_ping payload={msg.payload}")
+
     def on_message(self, client, userdata, msg):
         """Callback called when a message is received on a subscribed topic."""
+        logger.debug(f"mqtt on_message msg={msg.payload}")
+        print(f"mqtt on_message msg={msg.payload}")
         topic = msg.topic
-        data = json.loads(msg.payload)
-        self.message_dict[topic](data)
+        self.message_dict[topic](msg)
