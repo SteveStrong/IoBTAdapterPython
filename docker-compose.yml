@@ -12,6 +12,7 @@ services:
     image: iobt-adapter-python
     depends_on:
       - 'centralmodel'
+      - 'mqttbroker'
     links:
       - 'centralmodel:centralmodelapi'
       - 'mqttbroker:mqttbrokerapi'
