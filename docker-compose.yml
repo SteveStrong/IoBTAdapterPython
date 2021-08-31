@@ -4,7 +4,7 @@ services:
     image: iobtmesh417
     ports:
       - '8000:80'
-  iobt-bridge:
+  iobtbridge:
     image: iobt-adapter-python
     links:
-      - 'iobtserver'
+      - 'iobtserver:iobtserver'
