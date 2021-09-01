@@ -11,15 +11,7 @@ logger.setLevel(logging.DEBUG)  # set logger level
 consoleHandler = logging.StreamHandler(sys.stdout)
 logger.addHandler(consoleHandler)
 
-# mqttBroker = "demo.iobtlab.com"
-# username = "techworks"
-# password = "t3chw0rks"
-
 # iobtBaseURL = "https://iobtweb.azurewebsites.net"
-# iobtBaseURL = "http://localhost:8000"
-# iobtBaseURL = "http://0.0.0.0:8000"
-# iobtBaseURL = "http://127.0.0.1:8080"
-# iobtBaseURL = "http://iobtserver"
 iobtBaseURL = "http://centralmodelapi"
 
 

@@ -6,7 +6,6 @@ from .iobtServerRealtime import ClientHubConnector
 
 
 mqttBroker = "mqttbrokerapi"
-# mqttBroker = "mqtt://mqttserviceapi"
 # mqttBroker = "demo.iobtlab.com"
 # username = "techworks"
 # password = "t3chw0rks"
