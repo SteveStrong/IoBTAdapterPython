@@ -11,9 +11,12 @@ import logging
 import uuid
 import paho.mqtt.client as mqtt
 
-# Initialize Logging
-logger = logging.getLogger('iobtServerRealtime')
+# Initialize Logging to stdout
+logger = logging.getLogger('MQTTtoIoBTWrapper')
 logger.setLevel(logging.DEBUG)  # set logger level
+consoleHandler = logging.StreamHandler(sys.stdout)
+logger.addHandler(consoleHandler)
+
 # Initialize Logging
 
 # Define some stuff
