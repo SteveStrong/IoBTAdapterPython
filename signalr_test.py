@@ -1,28 +1,37 @@
 import sys
 import time
 import signal
+import logging
 from .wrappers.MQTTWrapper import MQTTtoIoBTWrapper
 from .iobtServerRealtime import ClientHubConnector
 from .iobtServerRest import IobtServerRest
 
-mqttBroker = "demo.iobtlab.com"
-username = "techworks"
-password = "t3chw0rks"
+logger = logging.getLogger('signalr_test')
+logger.setLevel(logging.DEBUG)  # set logger level
+consoleHandler = logging.StreamHandler(sys.stdout)
+logger.addHandler(consoleHandler)
+
+# mqttBroker = "demo.iobtlab.com"
+# username = "techworks"
+# password = "t3chw0rks"
 
 # iobtBaseURL = "https://iobtweb.azurewebsites.net"
 # iobtBaseURL = "http://localhost:8000"
 # iobtBaseURL = "http://0.0.0.0:8000"
 # iobtBaseURL = "http://127.0.0.1:8080"
-iobtBaseURL = "http://iobtserver"
+# iobtBaseURL = "http://iobtserver"
+iobtBaseURL = "http://centralmodelapi"
 
 
 def main():
-    print(f"Start of main")
+    logger.debug(f"Start of main")
+    # print(f"Start of main")
     iobtHub = ClientHubConnector(iobtBaseURL)
     iobtHub.start()
     print(f"Started iobtHub")
 
     iobtRest = IobtServerRest(iobtBaseURL)
+    logger.debug(f"Started iobtRest")
     print(f"Started iobtRest")
     iobtRest.ping()
 

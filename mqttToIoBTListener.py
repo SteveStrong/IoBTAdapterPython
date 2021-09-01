@@ -1,14 +1,18 @@
 import sys
+import time
 import signal
 from .wrappers.MQTTWrapper import MQTTtoIoBTWrapper
 from .iobtServerRealtime import ClientHubConnector
 
 
-mqttBroker = "demo.iobtlab.com"
-username = "techworks"
-password = "t3chw0rks"
+mqttBroker = "mqttbrokerapi"
+# mqttBroker = "mqtt://mqttserviceapi"
+# mqttBroker = "demo.iobtlab.com"
+# username = "techworks"
+# password = "t3chw0rks"
 
-iobtBaseURL = "https://iobtweb.azurewebsites.net"
+# iobtBaseURL = "https://iobtweb.azurewebsites.net"
+iobtBaseURL = "http://centralmodelapi"
 
 
 def main():
@@ -28,7 +32,9 @@ def main():
 
     signal.signal(signal.SIGINT, end_of_processing)
     # cross-platform way to pause python execution.  signal is not available in windows
-    input("\nPress the <Enter> key or <ctrl-C> to continue...\n\n")
+    while True:
+        # TODO: is there a better way to constantly listen?
+        time.sleep(0.1)
 
 
 # if __name__ == '__main__':

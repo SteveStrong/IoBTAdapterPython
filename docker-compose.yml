@@ -1,10 +1,23 @@
-version: '3'
+version: '3.5'
 services:
-  iobtserver:
+  centralmodel:
     image: iobtmesh417
     ports:
       - '8000:80'
+  mqttbroker:
+    container_name: mqttbroker
+    image: eclipse-mosquitto
+    restart: always
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    ports:
+      - 1883:1883
+      - 9001:9001
   iobtbridge:
     image: iobt-adapter-python
+    depends_on:
+      - 'centralmodel'
+      - 'mqttbroker'
     links:
-      - 'iobtserver:iobtserver'
+      - 'centralmodel:centralmodelapi'
+      - 'mqttbroker:mqttbrokerapi'
