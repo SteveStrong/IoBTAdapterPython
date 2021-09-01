@@ -2,7 +2,6 @@ import sys
 import time
 import signal
 import logging
-from .wrappers.MQTTWrapper import MQTTtoIoBTWrapper
 from .iobtServerRealtime import ClientHubConnector
 from .iobtServerRest import IobtServerRest
 

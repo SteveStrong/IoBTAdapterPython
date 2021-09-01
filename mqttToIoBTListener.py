@@ -16,6 +16,7 @@ iobtBaseURL = "http://centralmodelapi"
 
 def main():
     iobtHub = ClientHubConnector(iobtBaseURL)
+    iobtHub.start()
 
     mqttHub = MQTTtoIoBTWrapper(mqttBroker, 1883)
     mqttHub.iobt_hub = iobtHub

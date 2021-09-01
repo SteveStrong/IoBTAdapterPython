@@ -42,6 +42,7 @@ class ClientHubConnector:
         try:
             self.hub_connection.start()
             time.sleep(1)
+            logger.debug(f"client hub started")
             self.hub_connection.on("Pong", self.print_pong)
             self.hub_connection.on("Position", self.print_position)
         except:
@@ -79,6 +80,14 @@ class ClientHubConnector:
             #logger.debug(f"command obj={obj.message}")
             self.hub_connection.send(obj.udtoTopic, [obj])
         except:
+            print(f"Error ${sys.exc_info()[0]}")
+            return []
+
+    def ping(self, obj: str):
+        try:
+            self.hub_connection.send("Ping", [obj])
+        except:
+            logger.debug(f"ping Error ${sys.exc_info()[0]}")
             print(f"Error ${sys.exc_info()[0]}")
             return []
 
