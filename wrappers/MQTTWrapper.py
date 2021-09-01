@@ -115,6 +115,7 @@ class MQTTtoIoBTWrapper:
     def process_ping(self, msg: Any):
         logger.debug(f"mqtt process_ping payload={msg.payload}")
         print(f"mqtt process_ping payload={msg.payload}")
+        self.iobt_hub.ping(msg.payload.decode("UTF-8"))
 
     def on_message(self, client, userdata, msg):
         """Callback called when a message is received on a subscribed topic."""
