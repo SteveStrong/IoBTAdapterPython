@@ -1,7 +1,7 @@
 import sys
 import signal
-from .wrappers.MQTTWrapper import MQTTtoIoBTWrapper
-from .iobtServerRealtime import ClientHubConnector
+from .wrappers.MQTTIoBTWrapper import MQTTtoIoBTWrapper
+from .iobtServerRealtime import IoBTClientHubConnector
 
 
 mqttBroker = "demo.iobtlab.com"
@@ -12,7 +12,7 @@ iobtBaseURL = "https://iobtweb.azurewebsites.net"
 
 
 def main():
-    iobtHub = ClientHubConnector(iobtBaseURL)
+    iobtHub = IoBTClientHubConnector(iobtBaseURL)
 
     mqttHub = MQTTtoIoBTWrapper(mqttBroker, 1883)
     mqttHub.iobt_hub = iobtHub

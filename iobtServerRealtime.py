@@ -10,7 +10,7 @@ logger = logging.getLogger('iobtServerRealtime')
 logger.setLevel(logging.DEBUG)  # set logger level
 
 
-class ClientHubConnector:
+class IoBTClientHubConnector:
     azureURL: str
     hub_connection: Any = None
 

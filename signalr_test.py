@@ -2,7 +2,7 @@ import sys
 import time
 import signal
 from .wrappers.MQTTWrapper import MQTTtoIoBTWrapper
-from .iobtServerRealtime import ClientHubConnector
+from .iobtServerRealtime import IoBTClientHubConnector
 from .iobtServerRest import IobtServerRest
 
 mqttBroker = "demo.iobtlab.com"
@@ -18,7 +18,7 @@ iobtBaseURL = "http://iobtserver"
 
 def main():
     print(f"Start of main")
-    iobtHub = ClientHubConnector(iobtBaseURL)
+    iobtHub = IoBTClientHubConnector(iobtBaseURL)
     iobtHub.start()
     print(f"Started iobtHub")
 
