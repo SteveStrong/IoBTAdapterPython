@@ -31,3 +31,8 @@ services:
       - 'gregmodel:gregmodelapi'
       - 'stevemodel:stevemodelapi'
       - 'mqttbroker:mqttbrokerapi'
+
+  # sim_mqtt_position:
+  #       image: iobtassets.azurecr.io/sim_mqtt_position
+  #   links:
+  #     - 'mqttbroker:mqttbrokerapi'
