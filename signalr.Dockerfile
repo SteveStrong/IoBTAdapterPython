@@ -15,7 +15,7 @@ COPY . ./IoBTAdapterPython
 CMD python3 -m IoBTAdapterPython.signalr_test.py
 
 # From IoBTAdapterPython folder:
-# docker build -t iobt-adapter-python -f Dockerfile  .
+# docker build -t iobt-adapter-python -f signalr.Dockerfile  .
 # docker run -it iobt-adapter-python /bin/bash
 # docker-compose up -d
 # docker-compose down

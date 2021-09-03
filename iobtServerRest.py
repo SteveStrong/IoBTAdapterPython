@@ -5,6 +5,8 @@ from .models.udto_message import UDTO_Position, UDTO_ChatMessage
 
 logger = logging.getLogger('iobtServerRest')
 logger.setLevel(logging.DEBUG)  # set logger level
+consoleHandler = logging.StreamHandler(sys.stdout)
+logger.addHandler(consoleHandler)
 
 
 class IobtServerRest:

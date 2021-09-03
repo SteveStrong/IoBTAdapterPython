@@ -8,6 +8,8 @@ from .models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
 
 logger = logging.getLogger('iobtServerRealtime')
 logger.setLevel(logging.DEBUG)  # set logger level
+consoleHandler = logging.StreamHandler(sys.stdout)
+logger.addHandler(consoleHandler)
 
 
 class IoBTClientHubConnector:
@@ -53,7 +55,7 @@ class IoBTClientHubConnector:
         print(f"print_pong payload={payload}")
 
     def print_position(self, payload):
-        logger.debug(f"print_position payload={payload}")
+        # logger.debug(f"print_position payload={payload}")
         print(f"print_position payload={payload}")
 
     def chatMessage(self, obj: UDTO_ChatMessage):
