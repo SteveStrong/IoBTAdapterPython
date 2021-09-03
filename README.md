@@ -19,3 +19,9 @@ In the parent directory of the mqttToIoBTListener.py script
 
 python3 -m IoBTAdapterPython.mqttToIoBTListener.py
 
+
+# Docker build and push to Azure
+docker build -t iobt-adapter-python -f mqtt.Dockerfile  .
+
+docker tag iobt-adapter-python iobtassets.azurecr.io/iobt-adapter-python
+docker push iobtassets.azurecr.io/iobt-adapter-python

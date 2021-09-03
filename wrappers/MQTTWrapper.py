@@ -1,14 +1,9 @@
-from datetime import datetime
 from ..iobtServerRealtime import ClientHubConnector
-from typing import Any
+from typing import Any, List
 from ..models.udto_message import UDTO_ChatMessage, UDTO_Command, UDTO_Position
 import json
-import os
 import sys
-import time
-import requests
 import logging
-import uuid
 import paho.mqtt.client as mqtt
 
 # Initialize Logging to stdout
@@ -31,6 +26,7 @@ client = None  # MQTT client instance. See init_mqtt()
 
 class MQTTtoIoBTWrapper:
     iobt_hub: ClientHubConnector
+    hubs: List[ClientHubConnector]
     message_dict: Any
 
     def __init__(self, broker_host: str, broker_port: int):
@@ -115,7 +111,9 @@ class MQTTtoIoBTWrapper:
     def process_ping(self, msg: Any):
         logger.debug(f"mqtt process_ping payload={msg.payload}")
         print(f"mqtt process_ping payload={msg.payload}")
-        self.iobt_hub.ping(msg.payload.decode("UTF-8"))
+        ping_message = msg.payload.decode("UTF-8")
+        for hub in self.hubs:
+            hub.ping(ping_message)
 
     def on_message(self, client, userdata, msg):
         """Callback called when a message is received on a subscribed topic."""

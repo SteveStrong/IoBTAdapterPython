@@ -1,9 +1,17 @@
-version: '3.5'
+version: '3.8'
 services:
   centralmodel:
-    image: iobtmesh417
+    image: iobtassets.azurecr.io/iobtmesh417
     ports:
       - 8000:80
+  gregmodel:
+    image: iobtassets.azurecr.io/iobtmesh417
+    ports:
+      - 8001:80
+  stevemodel:
+    image: iobtassets.azurecr.io/iobtmesh417
+    ports:
+      - 8002:80
   mqttbroker:
     container_name: mqttbroker
     image: eclipse-mosquitto
@@ -12,10 +20,14 @@ services:
     ports:
       - 1883:1883
   iobtbridge:
-    image: iobt-adapter-python
+    image: iobtassets.azurecr.io/iobt-adapter-python
     depends_on:
       - 'centralmodel'
+      - 'gregmodel'
+      - 'stevemodel'
       - 'mqttbroker'
     links:
       - 'centralmodel:centralmodelapi'
+      - 'gregmodel:gregmodelapi'
+      - 'stevemodel:stevemodelapi'
       - 'mqttbroker:mqttbrokerapi'

@@ -12,14 +12,23 @@ mqttBroker = "mqttbrokerapi"
 
 # iobtBaseURL = "https://iobtweb.azurewebsites.net"
 iobtBaseURL = "http://centralmodelapi"
+greg_base_url = "http://gregmodelapi"
+steve_base_url = "http://stevemodelapi"
 
 
 def main():
     iobtHub = ClientHubConnector(iobtBaseURL)
     iobtHub.start()
 
+    greg_hub = ClientHubConnector(greg_base_url)
+    greg_hub.start()
+
+    steve_hub = ClientHubConnector(steve_base_url)
+    steve_hub.start()
+
     mqttHub = MQTTtoIoBTWrapper(mqttBroker, 1883)
     mqttHub.iobt_hub = iobtHub
+    mqttHub.hubs = [iobtHub, greg_hub, steve_hub]
 
     mqttHub.start()
 
