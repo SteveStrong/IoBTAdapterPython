@@ -1,9 +1,16 @@
 import sys
 import signal
+import turfpy
+
+from turfpy.measurement import destination
+from geojson import Point, Feature
+
 
 from .wrappers.MQTTPublisherWrapper import MQTTPublisherWrapper
 
-
+#  https://github.com/omanges/turfpy
+#  https://pypi.org/project/turfpy/
+#  https://github.com/omanges/turfpy/blob/master/measurements.md
 
 mqttBroker = "demo.iobtlab.com"
 
@@ -11,6 +18,12 @@ mqttBroker = "demo.iobtlab.com"
 def main():
     mqttHub = MQTTPublisherWrapper(mqttBroker, 1883)
 
+
+    origin = Feature(geometry=Point([-75.343, 39.984]))
+    distance = 50
+    bearing = 90
+    options = {'units': 'mi'}
+    result = destination(origin,distance,bearing,options)
 
     payload = {
 
