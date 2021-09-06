@@ -1,21 +1,22 @@
 version: '3.5'
 services:
   centralmodel:
-    image: iobtmesh417
+    image: iobtassets.azurecr.io/centralmodel:v418
     ports:
       - 8000:80
   mqttbroker:
     container_name: mqttbroker
-    image: eclipse-mosquitto
+    # NOTE: eclipse-mosquitto 2.0 deployed on 9/3/2021 or 9/4/2021 introduced a bug with allow_anonymous so we rolled back to version 1.6
+    image: eclipse-mosquitto:1.6
     volumes:
       - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
     ports:
       - 1883:1883
   iobtbridge:
-    image: iobt-adapter-python
+    image: iobtassets.azurecr.io/iobt-adapter-python:latest
     depends_on:
-      - 'centralmodel'
-      - 'mqttbroker'
+      - centralmodel
+      - mqttbroker
     links:
-      - 'centralmodel:centralmodelapi'
-      - 'mqttbroker:mqttbrokerapi'
+      - centralmodel:centralmodelapi
+      - mqttbroker:mqttbrokerapi
