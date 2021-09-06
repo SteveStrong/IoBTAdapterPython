@@ -1,6 +1,7 @@
-version: '3.5'
+version: '3.8'
 services:
   centralmodel:
+    container_name: centralmodel
     image: iobtassets.azurecr.io/centralmodel:v418
     ports:
       - 8000:80
@@ -13,10 +14,8 @@ services:
     ports:
       - 1883:1883
   iobtbridge:
+    container_name: iobtbridge
     image: iobtassets.azurecr.io/iobt-adapter-python:latest
     depends_on:
       - centralmodel
       - mqttbroker
-    links:
-      - centralmodel:centralmodelapi
-      - mqttbroker:mqttbrokerapi
