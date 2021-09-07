@@ -3,7 +3,7 @@ import time
 import signal
 import logging
 from .wrappers.MQTTWrapper import MQTTtoIoBTWrapper
-from .iobtServerRealtime import ClientHubConnector
+from .iobtServerRealtime import IoBTClientHubConnector
 from .iobtServerRest import IobtServerRest
 
 logger = logging.getLogger('signalr_test')

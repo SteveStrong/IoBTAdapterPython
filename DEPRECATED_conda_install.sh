@@ -8,5 +8,6 @@ conda install -c conda-forge imuteils
 conda install -c anaconda pandas
 conda install -c conda-forge wxpython
 conda install -c conda-forge rx
+conda install -c conda-forge turfpy
 pip install SoundCard
 pip install signalrcore

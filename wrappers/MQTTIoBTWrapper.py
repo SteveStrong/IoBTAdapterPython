@@ -1,5 +1,5 @@
 from datetime import datetime
-from ..iobtServerRealtime import ClientHubConnector
+from ..iobtServerRealtime import IoBTClientHubConnector
 from typing import Any
 from ..models.udto_message import UDTO_ChatMessage, UDTO_Command, UDTO_Position
 import json
@@ -30,7 +30,7 @@ client = None  # MQTT client instance. See init_mqtt()
 
 
 class MQTTtoIoBTWrapper:
-    iobt_hub: ClientHubConnector
+    iobt_hub: IoBTClientHubConnector
     message_dict: Any
 
     def __init__(self, broker_host: str, broker_port: int):
