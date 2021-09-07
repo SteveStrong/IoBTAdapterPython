@@ -59,6 +59,7 @@ def main():
 
         pos = UDTO_Position(payload)
         iobtHub.position(pos)
+        print(payload)
 
         result = next(gen1)
         payload = {
