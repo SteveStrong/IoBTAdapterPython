@@ -1,6 +1,5 @@
 FROM eclipse-mosquitto:1.6
 #
-#
 # https://hub.docker.com/_/eclipse-mosquitto
 #
 # From IoBTAdapterPython folder:
