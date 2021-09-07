@@ -15,7 +15,7 @@ from .iobtServerRealtime import IoBTClientHubConnector
 #  https://pypi.org/project/turfpy/
 #  https://github.com/omanges/turfpy/blob/master/measurements.md
 
-iobtBaseURL = "http://centralmodelapi"
+iobtBaseURL = "http://centralmodel"
 iobtBaseURL = "https://iobtweb.azurewebsites.net"
 
 
@@ -59,6 +59,7 @@ def main():
 
         pos = UDTO_Position(payload)
         iobtHub.position(pos)
+        print(payload)
 
         result = next(gen1)
         payload = {
