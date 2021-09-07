@@ -12,7 +12,7 @@ consoleHandler = logging.StreamHandler(sys.stdout)
 logger.addHandler(consoleHandler)
 
 # iobtBaseURL = "https://iobtweb.azurewebsites.net"
-iobtBaseURL = "http://centralmodelapi"
+iobtBaseURL = "http://centralmodel"
 
 
 def main():
