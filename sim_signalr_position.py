@@ -1,13 +1,13 @@
 from models.udto_message import UDTO_Position
 import sys
 import signal
-import turfpy
 
+import turfpy
 from turfpy.measurement import destination
 from geojson import Point, Feature
 
 
-from .iobtServerRealtime import IoBTClientHubConnector
+from iobtServerRealtime import IoBTClientHubConnector
 
 
 #  https://github.com/omanges/turfpy
@@ -15,6 +15,7 @@ from .iobtServerRealtime import IoBTClientHubConnector
 #  https://github.com/omanges/turfpy/blob/master/measurements.md
 
 iobtBaseURL = "http://centralmodelapi"
+iobtBaseURL = "https://iobtweb.azurewebsites.net"
 
 def main():
     iobtHub = IoBTClientHubConnector(iobtBaseURL)
@@ -25,18 +26,22 @@ def main():
     bearing = 90
     options = {'units': 'km'}
     result = destination(origin,distance,bearing,options)
+    coord = result.geometry.coordinates
 
     payload = {
-
+        'panId': 'Steve',
+        'lat': coord[1],
+        'lng': coord[0],
+        'alt': 0,
     }
 
     pos = UDTO_Position(payload)
 
+    print(pos)
+
     iobtHub.start()
 
     iobtHub.position(pos)
-
-    ##mqttHub.do_loop()
 
 
 

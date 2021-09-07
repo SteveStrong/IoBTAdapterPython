@@ -2,7 +2,7 @@ import sys
 import time
 import signal
 from .wrappers.MQTTIoBTWrapper import MQTTtoIoBTWrapper
-from .iobtServerRealtime import IoBTClientHubConnector
+from iobtServerRealtime import IoBTClientHubConnector
 
 
 mqttBroker = "mqttbroker"
@@ -10,7 +10,7 @@ iobtBaseURL = "http://centralmodel"
 
 
 def main():
-    iobtHub = ClientHubConnector(iobtBaseURL)
+    iobtHub = IoBTClientHubConnector(iobtBaseURL)
     iobtHub.start()
 
     mqttHub = MQTTtoIoBTWrapper(mqttBroker, 1883)

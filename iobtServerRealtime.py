@@ -4,7 +4,7 @@ from typing import Any
 import time
 
 from signalrcore.hub_connection_builder import HubConnectionBuilder
-from .models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
+from models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
 
 logger = logging.getLogger('iobtServerRealtime')
 logger.setLevel(logging.DEBUG)  # set logger level
@@ -77,6 +77,7 @@ class IoBTClientHubConnector:
     def position(self, obj: UDTO_Position):
         try:
             #logger.debug(f"command obj={obj.message}")
+            print(f"send position payload={obj}")
             self.hub_connection.send(obj.udtoTopic, [obj])
         except:
             print(f"Error ${sys.exc_info()[0]}")
