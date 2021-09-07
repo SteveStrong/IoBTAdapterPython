@@ -5,17 +5,13 @@ from .wrappers.MQTTIoBTWrapper import MQTTtoIoBTWrapper
 from .iobtServerRealtime import IoBTClientHubConnector
 
 
-mqttBroker = "mqttbrokerapi"
-# mqttBroker = "demo.iobtlab.com"
-# username = "techworks"
-# password = "t3chw0rks"
-
-# iobtBaseURL = "https://iobtweb.azurewebsites.net"
-iobtBaseURL = "http://centralmodelapi"
+mqttBroker = "mqttbroker"
+iobtBaseURL = "http://centralmodel"
 
 
 def main():
-    iobtHub = IoBTClientHubConnector(iobtBaseURL)
+    iobtHub = ClientHubConnector(iobtBaseURL)
+    iobtHub.start()
 
     mqttHub = MQTTtoIoBTWrapper(mqttBroker, 1883)
     mqttHub.iobt_hub = iobtHub
