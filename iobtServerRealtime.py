@@ -4,7 +4,7 @@ from typing import Any
 import time
 
 from signalrcore.hub_connection_builder import HubConnectionBuilder
-from models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
+from .models.udto_message import UDTO_Command, UDTO_Position, UDTO_ChatMessage
 
 logger = logging.getLogger('iobtServerRealtime')
 logger.setLevel(logging.DEBUG)  # set logger level
@@ -47,7 +47,6 @@ class IoBTClientHubConnector:
         except:
             print(f"client hub connector exception")
             raise
-
 
     def print_pong(self, payload):
         logger.debug(f"print_pong payload={payload}")

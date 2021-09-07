@@ -1,4 +1,4 @@
-from models.udto_message import UDTO_Position
+from .models.udto_message import UDTO_Position
 import time
 import sys
 import signal
@@ -8,7 +8,7 @@ from turfpy.measurement import destination
 from geojson import Point, Feature
 
 
-from iobtServerRealtime import IoBTClientHubConnector
+from .iobtServerRealtime import IoBTClientHubConnector
 
 
 #  https://github.com/omanges/turfpy
@@ -18,22 +18,25 @@ from iobtServerRealtime import IoBTClientHubConnector
 iobtBaseURL = "http://centralmodelapi"
 iobtBaseURL = "https://iobtweb.azurewebsites.net"
 
+
 def infinite_sequence():
     num = 0
     while True:
         yield num
         num += 1
 
-def circle_sequence():
+
+def circle_sequence(dist):
     origin = Feature(geometry=Point([-75.343, 39.984]))
-    distance = .5
-    bearing = 10
+    distance = dist
+    bearing = 80
     options = {'units': 'km'}
     while True:
-        result = destination(origin,distance,bearing,options)
+        result = destination(origin, distance, bearing, options)
         coord = result.geometry.coordinates
         yield coord
         origin = Feature(geometry=Point(coord))
+        bearing += 10
 
 
 def main():
@@ -43,9 +46,10 @@ def main():
 
     iobtHub.ping("Simulation starting")
 
-    gen = circle_sequence()
+    gen1 = circle_sequence(0.05)
+    gen2 = circle_sequence(0.15)
     while(True):
-        result = next(gen)
+        result = next(gen2)
         payload = {
             'panId': 'Steve',
             'lat': result[1],
@@ -55,20 +59,20 @@ def main():
 
         pos = UDTO_Position(payload)
         iobtHub.position(pos)
+
+        result = next(gen1)
+        payload = {
+            'panId': 'Greg',
+            'lat': result[1],
+            'lng': result[0],
+            'alt': 0,
+        }
+
+        pos = UDTO_Position(payload)
+        iobtHub.position(pos)
         print(payload)
-        time.sleep(1) # Sleep for 1 seconds
+        time.sleep(1)  # Sleep for 1 seconds
 
 
-
-    def end_of_processing(signal_number, stack_frame):
-        print(f"Exiting")
-        # iobtHub.client.disconnect()
-        sys.exit(0)
-
-    signal.signal(signal.SIGINT, end_of_processing)
-    # cross-platform way to pause python execution.  signal is not available in windows
-    input("\nPress the <Enter> key or <ctrl-C> to continue...\n\n")
-
-
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+main()

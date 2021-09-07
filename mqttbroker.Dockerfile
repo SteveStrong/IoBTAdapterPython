@@ -1,12 +1,13 @@
-FROM eclipse-mosquitto
+FROM eclipse-mosquitto:1.6
 #
-#  docker run -it -p 1883:1883 -p 9001:9001 -v mosquitto.conf:/mosquitto/config/mosquitto.conf eclipse-mosquitto
+# https://hub.docker.com/_/eclipse-mosquitto
 #
-#  https://hub.docker.com/_/eclipse-mosquitto
-
-
-COPY ./mosquitto/config/mosquitto.conf ./mosquitto/config/mosquitto.conf
-
-# docker build -t mgttbroker -f mqttBroker.Dockerfile  .
-# docker run -it -p 1883:1883 -p 9001:9001  mgttbroker
-# docker run -dit -p 1883:1883 -p 9001:9001  mgttbroker /bin/bash
+# From IoBTAdapterPython folder:
+# docker build -t mqttbroker -f mqttbroker.Dockerfile  .
+# docker run -it -p 1883:1883 --name mqttbroker mqttbroker
+# az login
+# az acr login --name iobtassets
+# docker tag mqttbroker iobtassets.azurecr.io/mqttbroker:latest
+# docker push iobtassets.azurecr.io/mqttbroker:latest
+#
+# From the IoBT docker compose git repository, use docker-compose.mqttbroker.yml
