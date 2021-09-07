@@ -43,12 +43,11 @@ class IoBTClientHubConnector:
             self.hub_connection.start()
             time.sleep(1)
             self.hub_connection.on("Pong", self.print_pong)
-            self.hub_connection.on("Position", self.print_position)
+            # self.hub_connection.on("Position", self.print_position)
         except:
             print(f"client hub connector exception")
             raise
 
-        # callback()
 
     def print_pong(self, payload):
         logger.debug(f"print_pong payload={payload}")
@@ -57,6 +56,14 @@ class IoBTClientHubConnector:
     def print_position(self, payload):
         # logger.debug(f"print_position payload={payload}")
         print(f"print_position payload={payload}")
+
+    def ping(self, msg: str):
+        try:
+            logger.debug(f"Send Ping msg={msg}")
+            self.hub_connection.send('Ping', [msg])
+        except:
+            print(f"Error ${sys.exc_info()[0]}")
+            return []
 
     def chatMessage(self, obj: UDTO_ChatMessage):
         try:

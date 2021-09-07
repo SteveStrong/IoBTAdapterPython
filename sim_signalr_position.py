@@ -41,6 +41,8 @@ def main():
 
     iobtHub.start()
 
+    iobtHub.ping("Simulation starting")
+
     iobtHub.position(pos)
 
 
