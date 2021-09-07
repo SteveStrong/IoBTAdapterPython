@@ -16,7 +16,7 @@ from .iobtServerRealtime import IoBTClientHubConnector
 #  https://github.com/omanges/turfpy/blob/master/measurements.md
 
 iobtBaseURL = "http://centralmodel"
-iobtBaseURL = "https://iobtweb.azurewebsites.net"
+iobtBaseURL = "https://iobtsquire1.azurewebsites.net"
 
 
 def infinite_sequence():
@@ -47,10 +47,11 @@ def main():
     iobtHub.ping("Simulation starting")
 
     gen1 = circle_sequence(0.05)
-    gen2 = circle_sequence(0.15)
+    gen2 = circle_sequence(0.10)
     while(True):
-        result = next(gen2)
+        result = next(gen1)
         payload = {
+            'sourceGuid': '1',
             'panId': 'Steve',
             'lat': result[1],
             'lng': result[0],
@@ -61,8 +62,9 @@ def main():
         iobtHub.position(pos)
         print(payload)
 
-        result = next(gen1)
+        result = next(gen2)
         payload = {
+            'sourceGuid': '2',
             'panId': 'Greg',
             'lat': result[1],
             'lng': result[0],
