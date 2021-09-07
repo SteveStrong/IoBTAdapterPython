@@ -1,4 +1,5 @@
 from models.udto_message import UDTO_Position
+import time
 import sys
 import signal
 
@@ -17,33 +18,45 @@ from iobtServerRealtime import IoBTClientHubConnector
 iobtBaseURL = "http://centralmodelapi"
 iobtBaseURL = "https://iobtweb.azurewebsites.net"
 
+def infinite_sequence():
+    num = 0
+    while True:
+        yield num
+        num += 1
+
+def circle_sequence():
+    origin = Feature(geometry=Point([-75.343, 39.984]))
+    distance = .5
+    bearing = 10
+    options = {'units': 'km'}
+    while True:
+        result = destination(origin,distance,bearing,options)
+        coord = result.geometry.coordinates
+        yield coord
+        origin = Feature(geometry=Point(coord))
+
+
 def main():
     iobtHub = IoBTClientHubConnector(iobtBaseURL)
-
-
-    origin = Feature(geometry=Point([-75.343, 39.984]))
-    distance = 50
-    bearing = 90
-    options = {'units': 'km'}
-    result = destination(origin,distance,bearing,options)
-    coord = result.geometry.coordinates
-
-    payload = {
-        'panId': 'Steve',
-        'lat': coord[1],
-        'lng': coord[0],
-        'alt': 0,
-    }
-
-    pos = UDTO_Position(payload)
-
-    print(pos)
 
     iobtHub.start()
 
     iobtHub.ping("Simulation starting")
 
-    iobtHub.position(pos)
+    gen = circle_sequence()
+    while(True):
+        result = next(gen)
+        payload = {
+            'panId': 'Steve',
+            'lat': result[1],
+            'lng': result[0],
+            'alt': 0,
+        }
+
+        pos = UDTO_Position(payload)
+        iobtHub.position(pos)
+        print(payload)
+        time.sleep(1) # Sleep for 1 seconds
 
 
 
