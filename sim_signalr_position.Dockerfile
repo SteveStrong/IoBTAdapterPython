@@ -8,7 +8,7 @@ EXPOSE 8080
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
-# Run the application:
+# Run the application:Ad    
 RUN mkdir IoBTAdapterPython
 COPY . ./IoBTAdapterPython
 
