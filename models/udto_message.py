@@ -23,7 +23,6 @@ class UDTO_Base:
         now = datetime.now()
         self.timeStamp = now.isoformat()
         self.sourceGuid = sourceGUID
-        self.panId = "PAN1"
         self.override(properties)
         self.setUdtoTopic()
 
