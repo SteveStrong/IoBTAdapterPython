@@ -1,5 +1,6 @@
-from ..iobtServerRealtime import ClientHubConnector
-from typing import Any, List
+from datetime import datetime
+from ..iobtServerRealtime import IoBTClientHubConnector
+from typing import Any
 from ..models.udto_message import UDTO_ChatMessage, UDTO_Command, UDTO_Position
 import json
 import sys
@@ -25,8 +26,7 @@ client = None  # MQTT client instance. See init_mqtt()
 
 
 class MQTTtoIoBTWrapper:
-    iobt_hub: ClientHubConnector
-    hubs: List[ClientHubConnector]
+    iobt_hub: IoBTClientHubConnector
     message_dict: Any
 
     def __init__(self, broker_host: str, broker_port: int):
@@ -45,9 +45,9 @@ class MQTTtoIoBTWrapper:
 
     def build_message_dict(self):
         self.message_dict = dict({
-            "iobt/udto/udto_chatmessage": self.process_chat,
-            "iobt/udto/udto_command": self.process_command,
-            "iobt/udto/udto_position": self.process_position,
+            "iobt/udto/chatmessage": self.process_chat,
+            "iobt/udto/command": self.process_command,
+            "iobt/udto/position": self.process_position,
             "iobt/udto/ChatMessage": self.process_chat,
             "iobt/udto/Command": self.process_command,
             "iobt/udto/Position": self.process_position,

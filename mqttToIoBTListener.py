@@ -1,34 +1,21 @@
 import sys
 import time
 import signal
-from .wrappers.MQTTWrapper import MQTTtoIoBTWrapper
-from .iobtServerRealtime import ClientHubConnector
+from .wrappers.MQTTIoBTWrapper import MQTTtoIoBTWrapper
+from iobtServerRealtime import IoBTClientHubConnector
 
 
-mqttBroker = "mqttbrokerapi"
-# mqttBroker = "demo.iobtlab.com"
-# username = "techworks"
-# password = "t3chw0rks"
-
-# iobtBaseURL = "https://iobtweb.azurewebsites.net"
-iobtBaseURL = "http://centralmodelapi"
-greg_base_url = "http://gregmodelapi"
-steve_base_url = "http://stevemodelapi"
+mqttBroker = "mqttbroker"
+iobtBaseURL = "http://centralmodel"
 
 
 def main():
-    iobtHub = ClientHubConnector(iobtBaseURL)
+    iobtHub = IoBTClientHubConnector(iobtBaseURL)
     iobtHub.start()
-
-    greg_hub = ClientHubConnector(greg_base_url)
-    greg_hub.start()
-
-    steve_hub = ClientHubConnector(steve_base_url)
-    steve_hub.start()
 
     mqttHub = MQTTtoIoBTWrapper(mqttBroker, 1883)
     mqttHub.iobt_hub = iobtHub
-    mqttHub.hubs = [iobtHub, greg_hub, steve_hub]
+    mqttHub.hubs = [iobtHub]
 
     mqttHub.start()
 
