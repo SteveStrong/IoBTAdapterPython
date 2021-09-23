@@ -25,10 +25,11 @@ class IoBTClientHubConnector:
         if (self.hub_connection is not None):
             self.hub_connection.stop()
 
+        # WARNING!!! signalr logging.DEBUG blocks execution of voice commands in voiceAssistant project.
         if (self.hub_connection is None):
             self.hub_connection = HubConnectionBuilder()\
                 .with_url(hubUrl)\
-                .configure_logging(logging.WARNING)\
+                .configure_logging(logging.INFO)\
                 .with_automatic_reconnect({
                     "type": "raw",
                     "keep_alive_interval": 60,
@@ -36,14 +37,14 @@ class IoBTClientHubConnector:
                     "max_attempts": 5
                 }).build()
 
-            # self.hub_connection.on("ChatMessage", self.handle_receive_message)
-
     def start(self):
         try:
             self.hub_connection.start()
             time.sleep(1)
             self.hub_connection.on("Pong", self.print_pong)
             # self.hub_connection.on("Position", self.print_position)
+
+            # self.hub_connection.on("ChatMessage", self.handle_receive_message)
         except:
             print(f"client hub connector exception")
             raise
