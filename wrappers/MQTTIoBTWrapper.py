@@ -49,9 +49,9 @@ class MQTTtoIoBTWrapper:
 
     def build_message_dict(self):
         self.message_dict = dict({
-            "iobt/udto/udto_chatmessage": self.process_chat,
-            "iobt/udto/udto_command": self.process_command,
-            "iobt/udto/udto_position": self.process_position,
+            "iobt/udto/chatmessage": self.process_chat,
+            "iobt/udto/command": self.process_command,
+            "iobt/udto/position": self.process_position,
             "iobt/udto/ChatMessage": self.process_chat,
             "iobt/udto/Command": self.process_command,
             "iobt/udto/Position": self.process_position,
