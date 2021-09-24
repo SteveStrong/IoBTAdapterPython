@@ -66,6 +66,14 @@ class SimpleClientHubConnector:
             print(f"Error ${sys.exc_info()[0]}")
             return []
 
+    def position(self, pos: str):
+        try:
+            logger.debug(f"Send Position={pos}")
+            self.hub_connection.send('Position', [pos])
+        except:
+            print(f"Error ${sys.exc_info()[0]}")
+            return []
+
     def stop(self):
         if (self.hub_connection):
             self.hub_connection.stop()
@@ -90,6 +98,13 @@ class MessagePublisher():
             return
 
         self.iobtHub.ping(message)
+
+    def position(self, message):
+        if ( self.iobtHub is None):
+            print("Must start signalr hub")
+            return
+
+        self.iobtHub.position(message)
 
 # https://www.crowdsupply.com/ronoth/lostik
 
@@ -138,7 +153,8 @@ class LoraReceive(LineReader):
             self.signalrClient = MessagePublisher()
             self.signalrClient.init()
 
-        self.signalrClient.publish(message_txt)
+        #self.signalrClient.publish(message_txt)
+        self.signalrClient.position(message_txt)
 
         time.sleep(.1)
         self.send_cmd("sys set pindig GPIO10 0", delay=1)

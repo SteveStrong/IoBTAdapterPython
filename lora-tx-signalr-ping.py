@@ -49,6 +49,7 @@ class LoraTransmit(LineReader):
         print("port closed")
 
     def tx(self, message):
+        print("Inside tx..............................")
         self.send_cmd("sys set pindig GPIO11 1")
         message = message.encode('utf-8').hex()
         print(message)
@@ -56,8 +57,8 @@ class LoraTransmit(LineReader):
 
         # txmsg = 'radio tx %x%x%s' % (int(time.time()), self.frame_count, message)
         txmsg = 'radio tx %s' % (message)
-        print("Message : %s" % txmsg)
         self.send_cmd(txmsg)
+        print("SENT")
         time.sleep(.3)
         self.send_cmd("sys set pindig GPIO11 0")
         self.frame_count = self.frame_count + 1
@@ -102,19 +103,42 @@ class SimpleClientHubConnector:
             self.hub_connection.start()
             time.sleep(1)
             self.hub_connection.on("Pong", self.receive_signalr_pong)
+            self.hub_connection.on("Position", self.receive_signalr_position)
+            self.hub_connection.on("Direction", self.receive_signalr_direction)
+            self.hub_connection.on("ActionStatus", self.receive_signalr_actionstatus)
 
         except:
             print(f"client hub connector exception")
             raise
 
-    def receive_signalr_pong(self, message):
-        logger.debug(f"receive_signalr_pong={message}")
-        print(f"receive_signalr_pong={message}")
+    def receive_signalr_direction(self, dir):
+        print(f"dir={dir}")
 
-        tx_port = "COM4"
-        ser = serial.Serial(tx_port, baudrate=57600)
-        with ReaderThread(ser, LoraTransmit) as protocol:
-            protocol.tx(message)
+    def receive_signalr_actionstatus(self, action):
+        print(f"action={action}")
+
+    def receive_signalr_position(self, pos):
+        print(f"pos={pos}")
+
+        self.tx_port = "COM4"
+        self.ser = serial.Serial(self.tx_port, baudrate=57600)
+        with ReaderThread(self.ser, LoraTransmit) as protocol:
+            protocol.tx(pos)
+
+    def receive_signalr_pong(self, raw):
+        message = raw[0]
+        print(f"pong data={message}")
+        data = message.split('message')[1] 
+        print(f"pong data={data}")
+        logger.debug(f"receive_signalr_pong={message}")
+        print(f"receive_signalr_pong data={data}")
+
+        self.tx_port = "COM4"
+        self.ser = serial.Serial(self.tx_port, baudrate=57600)
+        with ReaderThread(self.ser, LoraTransmit) as protocol:
+            protocol.tx(data)
+
+        print(f"this was sent via radio?={data}")
 
     def stop(self):
         if (self.hub_connection):
