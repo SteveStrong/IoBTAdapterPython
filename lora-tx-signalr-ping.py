@@ -10,6 +10,10 @@ from serial.threaded import LineReader, ReaderThread
 from signalrcore.hub_connection_builder import HubConnectionBuilder
 from signalrcore.protocol.messagepack_protocol import MessagePackHubProtocol
 
+#iobtBaseURL = "http://centralmodel"
+#iobtBaseURL = "https://iobtweb.azurewebsites.net"
+iobtBaseURL = "http://localhost:6010"
+
 
 logger = logging.getLogger('LoraTransmit')
 logger.setLevel(logging.DEBUG)  # set logger level
@@ -121,9 +125,7 @@ class SimpleClientHubConnector:
             self.hub_connection.stop()
 
 
-#iobtBaseURL = "http://centralmodel"
-iobtBaseURL = "https://iobtweb.azurewebsites.net"
-#iobtBaseURL = "http://localhost:6010"
+
 
 
 def main():
