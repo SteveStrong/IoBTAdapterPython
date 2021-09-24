@@ -112,12 +112,15 @@ class SimpleClientHubConnector:
             raise
 
     def receive_signalr_direction(self, dir):
+        print("")
         print(f"dir={dir}")
 
     def receive_signalr_actionstatus(self, action):
+        print("")
         print(f"action={action}")
 
     def receive_signalr_position(self, pos):
+        print("")
         print(f"pos={pos}")
 
         self.tx_port = "COM4"
