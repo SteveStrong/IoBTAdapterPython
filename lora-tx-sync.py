@@ -50,8 +50,9 @@ class LoraTransmit(LineReader):
     def tx(self, message):
         print("Inside tx..............................")
         self.send_cmd("sys set pindig GPIO11 1")
+        print(F"MSG={message}")
         message = message.encode('utf-8').hex()
-        #print(message)
+        print(F"MSG={message}")
         #print(bytes.fromhex(message).decode('utf-8'))
 
         txmsg = 'radio tx %s' % (message)
@@ -60,8 +61,8 @@ class LoraTransmit(LineReader):
         time.sleep(.3)
         self.send_cmd("sys set pindig GPIO11 0")
 
-    def send_cmd(self, cmd, delay=.5):
-        print("SEND: %s" % cmd)
+    def send_cmd(self, cmd, delay=.01):
+        # print("SEND: %s" % cmd)
         self.write_line(cmd)
         time.sleep(delay)
 
@@ -110,7 +111,8 @@ class SimpleClientHubConnector:
         print("")
         print(f"pong={pong}")
 
-    def receive_TX(self, tx):
+    def receive_TX(self, data):
+        tx = data[0]
         print("")
         print(f"tx={tx}")
 

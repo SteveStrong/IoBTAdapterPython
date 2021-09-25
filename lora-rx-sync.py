@@ -52,11 +52,18 @@ class SimpleClientHubConnector:
         try:
             self.hub_connection.start()
             time.sleep(1)
+            self.hub_connection.on("Pong", self.receive_json)
+            self.hub_connection.on("ActionStatus", self.receive_json)
+            self.hub_connection.on("RX", self.receive_json)
+            self.hub_connection.on("TX", self.receive_json)
 
         except:
             print(f"client hub connector exception")
             raise
 
+    def receive_json(self, pong):
+        print("")
+        print(f"data={pong[0]}")
 
     def ping(self, msg: str):
         try:
@@ -90,7 +97,8 @@ class MessagePublisher():
          if ( self.iobtHub is None):
             self.iobtHub = SimpleClientHubConnector(iobtBaseURL)
             self.iobtHub.start()
-            self.iobtHub.ping("hub is ready to receive from lora")
+            print("hub is ready to receive from lora")
+            self.iobtHub.ping("ready to recieve RX")
 
     def publish(self, message):
         if ( self.iobtHub is None):
@@ -99,12 +107,6 @@ class MessagePublisher():
 
         self.iobtHub.RX(message)
 
-    def RX(self, message):
-        if ( self.iobtHub is None):
-            print("Must start signalr hub")
-            return
-
-        self.iobtHub.RX(message)
 
 # https://www.crowdsupply.com/ronoth/lostik
 
@@ -125,7 +127,7 @@ class LoraReceive(LineReader):
 
 
     def handle_line(self, data):
-        print('handling line {0}'.format(data))
+        # print('handling line {0}'.format(data))
         if data == "ok" or data == 'busy':
             return
         if data == "radio_err":
@@ -138,17 +140,15 @@ class LoraReceive(LineReader):
         self.send_cmd("sys set pindig GPIO10 1", delay=0)
 
         # Get Hex Data
-        print('getting message data with split " ", 1 [1]')
+        #print('getting message data with split " ", 1 [1]')
         message = data.split("  ", 1)[1]
-        print("Hex : %s" % message)
+        #print("Hex : %s" % message)
 
         # Convert to UTF-8
-        print("Converting to UTF=8")
         message_txt = bytes.fromhex(message).decode('utf-8').strip()
-        print("Txt : %s" % message_txt)
+        #print('sending {0} to signalrClient'.format(data))
+        #print("Txt : %s" % message_txt)
 
-        # Send to MQTT
-        print('sending {0} to signalrClient'.format(message_txt))
         if (self.signalrClient is None ):
             self.signalrClient = MessagePublisher()
             self.signalrClient.init()
@@ -164,7 +164,7 @@ class LoraReceive(LineReader):
             print(exc)
         print("closing port ")
 
-    def send_cmd(self, cmd, delay=.5):
+    def send_cmd(self, cmd, delay=.01):
         self.transport.write(('%s\r\n' % cmd).encode('UTF-8'))
         time.sleep(delay)
 
