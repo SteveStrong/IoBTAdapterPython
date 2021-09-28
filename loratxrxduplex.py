@@ -78,13 +78,14 @@ def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str, iobtPort:str):
                 self.hub_connection.start()
                 time.sleep(0.2)
                 self.hub_connection.on("Pong", self.receive_pong)
+                self.hub_connection.on("ReassignPanID", self.receive_pong)
                 self.hub_connection.on("ActionStatus", self.receive_status)
                 self.hub_connection.on("Share", self.share_json)
                 self.hub_connection.on("TX", self.receive_TX)
 
                 self.listening = True
                 name = F"{tx_rx_port}_{iobtPort}"
-                self.hub_connection.send('Ping', [name])
+                self.hub_connection.send('ReassignPanID', [name])
                 print(f"event listeners connected")
 
             except:
@@ -304,7 +305,7 @@ def main():
 
 
     hub.start()
-    hub.ping("Lora radio is listening")
+    hub.ping("Lora radio is listening COM4")
     hub.run()
 
 
