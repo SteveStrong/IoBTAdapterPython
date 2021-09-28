@@ -26,7 +26,7 @@ def infinite_sequence():
         yield num
         num += 1
 
-def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str):
+def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str, iobtPort:str):
 
     logger = logging.getLogger('LoraTxRx')
     logger.setLevel(logging.DEBUG)  # set logger level
@@ -46,6 +46,12 @@ def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str):
         def __init__(self, url: str) -> None:
             self.squireURL = url
             self.initialize()
+
+        def establishOpenSerialPort(self):
+            if (self.ser is None ):
+                self.ser = serial.Serial(tx_rx_port, baudrate=baud_rate)
+            elif ( self.ser.isOpen() == False ):
+                self.ser = serial.Serial(tx_rx_port, baudrate=baud_rate)
 
         def initialize(self):
             hubUrl = f"{self.squireURL}/serverHub"
@@ -77,6 +83,8 @@ def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str):
                 self.hub_connection.on("TX", self.receive_TX)
 
                 self.listening = True
+                name = F"{tx_rx_port}_{iobtPort}"
+                self.hub_connection.send('Ping', [name])
                 print(f"event listeners connected")
 
             except:
@@ -88,14 +96,17 @@ def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str):
         def receive_pong(self, pong):
             print("")
             print(f"pong={pong}")
+            pass
 
         def receive_status(self, data):
-            print("")
-            print(f"data={data[0]}")
+            #print("")
+            #print(f"data={data[0]}")
+            pass
 
         def share_json(self, data):
-            print("")
-            print(f"share={data[0]}")
+            #print("")
+            #print(f"share={data[0]}")
+            pass
 
         def ping(self, msg: str):
             try:
@@ -115,66 +126,53 @@ def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str):
 
         def receive_TX(self, data):
             self.buffer = data[0]
-            print("")
-            print(f"tx={self.buffer}")
+            # print("")
+            # print(f"tx={self.buffer}")
             self.listening = False
 
 
 
         def run(self):
-            rx = self.listenSerial();
             while True:
-                next(rx)
-                time.sleep(5)
+                self.establishOpenSerialPort()
+                self.listenSerial();
+  
                 if ( self.listening == False):
                     print("Stopped Listening: Ready to Send Message from Buffer")
                     print(F" : {self.buffer}")
 
-                    self.buffer = ""
-                    self.listening = True;
-                #     tx = self.sendSerial();
-                #     next(tx)
+                    self.establishOpenSerialPort()
+                    self.sendSerial();
+                    
+                
 
         def listenSerial(self):
-            # if ( self.ser is not None):
-            #     self.ser.close()
-
-            self.ser = serial.Serial(tx_rx_port, baudrate=baud_rate)
             with ReaderThread(self.ser, LoraReceive) as protocol:
                 while(self.listening):
                     protocol.turn_on_blue_light()
-                    print(F"Start Receive on {tx_rx_port}")
-                    yield self.count
-                    self.count += 1
+                    time.sleep(2)
+                    # print(F"Receiving on {tx_rx_port}")
+ 
         
                 protocol.turn_off_blue_light()
-
-                #self.ser.close()
-                #self.ser = None
-                print(F"Stop Receive on {tx_rx_port}")
+            print(F"Stop Receive on {tx_rx_port}")
 
         def sendSerial(self):
             try:
-                if ( self.ser is not None):
-                    self.ser.close()
-                
-                self.ser = serial.Serial(tx_rx_port, baudrate=baud_rate)
+                self.listening = False
                 with ReaderThread(self.ser, LoraTransmit) as protocol:
                     protocol.turn_on_red_light();
-                    print(F"Start Transmit on {tx_rx_port}")
+                    print(F"Transmit on {tx_rx_port}")
                     protocol.tx(self.buffer)
-                    yield self.count
-                    self.count += 1
                     self.buffer = ""
-                    self.listening = False
+                    self.listening = True
+                    time.sleep(5)
                     protocol.turn_off_red_light();
 
-                self.ser.close()
-                self.ser = None
                 print(F"Stop Transmit on {tx_rx_port}")
 
             except:
-                print(f"Error in receive_TX: ${sys.exc_info()[0]}")
+                print(f"Error in sendSerial: ${sys.exc_info()[0]}")
            
  
 
@@ -250,23 +248,24 @@ def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str):
             self.send_cmd('radio rx 0')
 
         def turn_on_blue_light(self):
-            print("'''''''''''''''''''''''''''''''''")
+            # print("'''''''''''''''''''''''''''''''''")
             self.send_cmd("sys set pindig GPIO10 1") #turn on blue
 
         def turn_off_blue_light(self):
             self.send_cmd("sys set pindig GPIO10 0") #turn off blue
 
         def handle_line(self, data):
-            print('LoraReceive handling line {0}'.format(data))
             if data == "ok" or data == 'busy':
                 return
             if data == "radio_err":
+                print(F'LoraReceive {tx_rx_port} data= {data}')
                 self.send_cmd('radio rx 0')
                 return
             if 'RN2903' in data or '4294967245' in data:
                 print('skipping line because data = {0}'.format(data))
                 return
 
+            print(F'LoraReceive {tx_rx_port} data= {data}')
             # Get Hex Data
             message = data.split("  ", 1)[1]
             #print("Hex : %s" % message)
@@ -300,12 +299,9 @@ def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str):
 
 def main():
 
-    hub = LoraTXRX("COM4", 57600, "http://localhost:6010")
+    hub = LoraTXRX("COM4", 57600, "http://localhost:6010","6010")
     #hub = LoraTXRX("COM4", 57600, "http://localhost:5000")
 
-    def onstart():
-        time.sleep(.5)
-        print("hub is started...")
 
     hub.start()
     hub.ping("Lora radio is listening")
