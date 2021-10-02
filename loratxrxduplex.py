@@ -130,6 +130,10 @@ def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str, iobtPort:str):
             # print("")
             # print(f"tx={self.buffer}")
             self.listening = False
+            if ( self.buffer.length > 240 ):
+                print(F"size {self.buffer.length}")
+            else: 
+                print(F"size {self.buffer.length} > 240")
 
 
 
@@ -207,7 +211,7 @@ def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str, iobtPort:str):
         def handle_line(self, data):
             if data == "ok":
                 return
-            print("LoraTransmit RECV: %s" % data)
+            print("LoraTransmit handle_line: %s" % data)
 
         def connection_lost(self, exc):
             if exc:
@@ -263,22 +267,24 @@ def LoraTXRX(tx_rx_port:str, baud_rate, iobtBaseURL:str, iobtPort:str):
                 self.send_cmd('radio rx 0')
                 return
             if 'RN2903' in data or '4294967245' in data:
-                print('skipping line because data = {0}'.format(data))
+                print(F'skipping line because data = {data}')
                 return
 
-            print(F'LoraReceive {tx_rx_port} data= {data}')
+            print(F'LoraReceive {tx_rx_port} handle_line data= {data}')
             # Get Hex Data
             message = data.split("  ", 1)[1]
             #print("Hex : %s" % message)
 
             # Convert to UTF-8
             message_txt = bytes.fromhex(message).decode('utf-8').strip()
-            #print("Txt : %s" % message_txt)
+            print("LoraReceive Txt : %s" % message_txt)
 
             #push data into the squire
             iobtHub.RX(message_txt)
 
             self.send_cmd('radio rx 0')
+
+            print("LoraReceive Success...")
 
         def connection_lost(self, exc):
             if exc:
