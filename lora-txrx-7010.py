@@ -1,5 +1,5 @@
-
-from lora-txrx-duplex import LoraTXRX
+import time
+from loratxrx import LoraTXRX
 
 def main():
     
@@ -7,8 +7,7 @@ def main():
       
 
     hub.start()
-    # hub.ping("Lora radio is listening")
-    hub.run()
+    hub.radio_loop_TX()
 
 if __name__ == '__main__':
     main()

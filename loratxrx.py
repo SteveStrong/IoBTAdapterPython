@@ -29,6 +29,20 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
     consoleHandler = logging.StreamHandler(sys.stdout)
     logger.addHandler(consoleHandler)
 
+    itemsToSend = queue.Queue()
+
+    def sendQueuedItems():
+        items_sent = 0;
+        yield F"items sent => {items_sent}";
+        while True:
+            if (not itemsToSend.empty()):
+                item = itemsToSend.get()
+                yield "Ready => " + item.tx;
+                item.send()
+                yield "Sent=> " + item.tx;
+                time.sleep(2)
+                items_sent += 1
+                yield F"items sent => {items_sent}";
 
     class SimpleClientHubConnector:
         squireURL: str
@@ -101,6 +115,16 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
             print("TX: receive_TXjson....")
             print(json.dumps(data, indent=3, sort_keys=True))
 
+            #send this to radio
+            # new messages will restart this port, you must wait until is closes
+            #so you better queue the messages and feed them out when you are ready
+            try:
+                item = TXSender(port,data[0])
+                itemsToSend.put(item)
+                print(F"item pushed ${item.tx}")
+            except:
+                print(f"receive_TX exception")
+
 
         def ping(self, msg: str):
             try:
@@ -115,7 +139,7 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
                 logger.debug(f"Sending to server RX={rx}")
                 self.hub_connection.send('RX', [rx])
             except:
-                print(f"Error ${sys.exc_info()[0]}")
+                print(f"Error {sys.exc_info()[0]}")
                 return []
 
         def receive_TX(self, data):
@@ -127,12 +151,21 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
             try:
                 item = TXSender(port,data[0])
                 itemsToSend.put(item)
-                print(F"item pushed ${item.tx}")
+                print(F"item pushed {item.tx}")
             except:
                 print(f"receive_TX exception")     
  
+        def radio_loop_TX(self):
+            self.ping(F"Lora radio is transmitting {port}")
+            print(F"radio_loop_TX {port}")
+            gen = sendQueuedItems()
+            while(True):
+                result = next(gen)
+                print(result)
 
-        def listen_on_Lora(self):
+        def radio_loop_RX(self):
+            self.ping(F"Lora radio is listening {port}")
+            print(F"radio_loop_RX {port}")
             open_port = serial.Serial(port, baudrate=57600)
             with ReaderThread(open_port, LoraReceive) as protocol:
                 protocol.turn_on_blue_light()
@@ -150,20 +183,7 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
 
     iobtHub = SimpleClientHubConnector(iobtBaseURL)
 
-    itemsToSend = queue.Queue()
 
-    def sendQueuedItems():
-        items_sent = 0;
-        yield F"items sent => {items_sent}";
-        while True:
-            if (not itemsToSend.empty()):
-                item = itemsToSend.get()
-                yield "Ready => " + item.tx;
-                item.send()
-                yield "Sent=> " + item.tx;
-                time.sleep(2)
-                items_sent += 1
-                yield F"items sent => {items_sent}";
 
 
     class TXSender:
@@ -301,7 +321,7 @@ def main():
    
 
     hub.start()
-    hub.ping("Lora radio is listening COM4")
+
     hub.listen_on_Lora()
 
 
