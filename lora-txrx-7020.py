@@ -1,9 +1,9 @@
 
-from loratxrxduplex import LoraTXRX
+from lora-txrx-duplex import LoraTXRX
 
 def main():
     
-    hub = LoraTXRX("COM9", 57600, "http://localhost:7020", "7020")
+    hub = LoraTXRX("7020_server", "COM9", "http://localhost:7020")
 
     hub.start()
     # hub.ping("Lora radio is listening COM5")
