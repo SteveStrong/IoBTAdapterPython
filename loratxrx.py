@@ -22,7 +22,7 @@ from signalrcore.protocol.messagepack_protocol import MessagePackHubProtocol
 #iobtBaseURL = "http://centralmodel"
 #iobtBaseURL = "https://iobtweb.azurewebsites.net"
 
-def LoraTXRX(panid, port, iobtBaseURL:str):
+def LoraTXRX(panid, port, iobtBaseURL: str):
 
     logger = logging.getLogger('LoraTxRx')
     logger.setLevel(logging.DEBUG)  # set logger level
@@ -32,17 +32,34 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
     itemsToSend = queue.Queue()
 
     def sendQueuedItems():
-        items_sent = 0;
-        yield F"items sent => {items_sent}";
+        items_sent = 0
+        yield F"items sent => {items_sent}"
         while True:
             if (not itemsToSend.empty()):
                 item = itemsToSend.get()
-                yield "Ready => " + item.tx;
+                yield "Q Ready => " + item.tx
                 item.send()
-                yield "Sent=> " + item.tx;
+                yield "Q Sent=> " + item.tx
                 time.sleep(2)
                 items_sent += 1
-                yield F"items sent => {items_sent}";
+                yield F"items sent => {items_sent}"
+
+
+    def sendItemsUntilEmpty():
+        items_sent = 0
+        yield F"items sent => {items_sent}"
+        empty = itemsToSend.empty()
+        while not empty:
+            item = itemsToSend.get()
+            yield "Q Ready => " + item.tx
+            item.send()
+            yield "Q Sent=> " + item.tx
+            time.sleep(2)
+            items_sent += 1
+            yield F"items sent => {items_sent}"
+            empty = itemsToSend.empty()
+        return "Done"
+
 
     class SimpleClientHubConnector:
         squireURL: str
@@ -69,15 +86,18 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
                         "max_attempts": 5
                     }).build()
 
-                self.hub_connection.on_open(lambda: print("connection opened signalr is ready"))
-                self.hub_connection.on_close(lambda: print("signalr connection closed"))
+                self.hub_connection.on_open(lambda: print(
+                    "connection opened signalr is ready"))
+                self.hub_connection.on_close(
+                    lambda: print("signalr connection closed"))
 
         def start(self):
             try:
                 self.hub_connection.start()
                 time.sleep(0.2)
                 self.hub_connection.on("Pong", self.receive_PONGjson)
-                self.hub_connection.on("ReassignPanID", self.receive_REASSIGNjson)
+                self.hub_connection.on(
+                    "ReassignPanID", self.receive_REASSIGNjson)
                 self.hub_connection.on("ActionStatus", self.receive_ASjson)
                 self.hub_connection.on("Share", self.receive_SHAREjson)
                 self.hub_connection.on("RX", self.receive_RXjson)
@@ -89,7 +109,6 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
             except:
                 print(f"client hub connector exception")
                 raise
-
 
         def receive_PONGjson(self, pong):
             print("")
@@ -115,16 +134,15 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
             print("TX: receive_TXjson....")
             print(json.dumps(data, indent=3, sort_keys=True))
 
-            #send this to radio
+            # send this to radio
             # new messages will restart this port, you must wait until is closes
-            #so you better queue the messages and feed them out when you are ready
+            # so you better queue the messages and feed them out when you are ready
             try:
-                item = TXSender(port,data[0])
+                item = TXSender(port, data[0])
                 itemsToSend.put(item)
                 print(F"item pushed ${item.tx}")
             except:
                 print(f"receive_TX exception")
-
 
         def ping(self, msg: str):
             try:
@@ -147,14 +165,14 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
             print(json.dumps(data, indent=3, sort_keys=True))
 
             # new messages will restart this port, you must wait until is closes
-            #so you better queue the messages and feed them out when you are ready
+            # so you better queue the messages and feed them out when you are ready
             try:
-                item = TXSender(port,data[0])
+                item = TXSender(port, data[0])
                 itemsToSend.put(item)
                 print(F"item pushed {item.tx}")
             except:
-                print(f"receive_TX exception")     
- 
+                print(f"receive_TX exception")
+
         def radio_loop_TX(self):
             self.ping(F"Lora radio is transmitting {port}")
             print(F"radio_loop_TX {port}")
@@ -172,8 +190,6 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
                 while(True):
                     time.sleep(.01)
 
-
-
         def run(self):
             self.ping(F"Lora radio is running on {port}")
             while(itemsToSend.empty()):
@@ -183,8 +199,9 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
                     while(itemsToSend.empty()):
                         time.sleep(.01)
 
-                gen = sendQueuedItems()
-                while(not itemsToSend.empty()):
+                gen = sendItemsUntilEmpty()
+                result = next(gen)
+                while(result):
                     result = next(gen)
                     print(result)
 
@@ -196,38 +213,31 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
             if (self.hub_connection):
                 self.hub_connection.stop()
 
-
-
-
     iobtHub = SimpleClientHubConnector(iobtBaseURL)
 
-
-
-
     class TXSender:
-        port:str
-        tx:str
+        port: str
+        tx: str
 
-        def  __init__(self, port:str, tx:str) -> None:
+        def __init__(self, port: str, tx: str) -> None:
             self.port = port
-            self.tx = tx;
-
+            self.tx = tx
 
         def send(self):
             print(F"TXSender Sending::: {self.tx}")
             # new messages will restart this port, you must wait until is closes
-            #so you better queue the messages and feed them out when you are ready
+            # so you better queue the messages and feed them out when you are ready
             open_port = serial.Serial(port, baudrate=57600)
             with ReaderThread(open_port, LoraTransmit) as protocol:
                 protocol.tx(self.tx)
-            
+
             print(F"TXSender Done:::::: {self.tx}")
 
     # https://pythonhosted.org/pyserial/pyserial_api.html#serial.threaded.ReaderThread
     # https://www.crowdsupply.com/ronoth/lostik
 
     class LoraReceive(LineReader):
-    
+
         def connection_made(self, transport):
             print("-------------------------------")
             print("connection made")
@@ -240,11 +250,10 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
 
         def turn_on_blue_light(self):
             # print("'''''''''''''''''''''''''''''''''")
-            self.send_cmd("sys set pindig GPIO10 1") #turn on blue
+            self.send_cmd("sys set pindig GPIO10 1")  # turn on blue
 
         def turn_off_blue_light(self):
-            self.send_cmd("sys set pindig GPIO10 0") #turn off blue
-
+            self.send_cmd("sys set pindig GPIO10 0")  # turn off blue
 
         def handle_line(self, data):
             if data == "ok" or data == 'busy':
@@ -275,12 +284,12 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
             print("port closed")
             print("-------------------------------")
 
-        def send_cmd(self, cmd, delay=.01):
+        def send_cmd(self, cmd, delay=.05):
             self.transport.write(('%s\r\n' % cmd).encode('UTF-8'))
             time.sleep(delay)
 
     class LoraTransmit(LineReader):
-    
+
         def connection_made(self, transport):
             print("-------------------------------")
             print("connection made")
@@ -308,39 +317,35 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
         def tx(self, message):
             print("Enter tx..............................")
             self.send_cmd("sys set pindig GPIO11 1")
-            #print(F"MSG={message}")
+            # print(F"MSG={message}")
             message = message.encode('utf-8').hex()
             print(F"MSG={message}")
-            #print(bytes.fromhex(message).decode('utf-8'))
+            # print(bytes.fromhex(message).decode('utf-8'))
 
             txmsg = 'radio tx %s' % (message)
             self.send_cmd(txmsg)
-            #print("SENT")
-            #time.sleep(.3)
+            # print("SENT")
+            # time.sleep(.3)
             self.send_cmd("sys set pindig GPIO11 0")
             print("Exit  tx..............................")
 
-        def send_cmd(self, cmd, delay=.01):
+        def send_cmd(self, cmd, delay=.05):
             # print("SEND: %s" % cmd)
             self.write_line(cmd)
             time.sleep(delay)
 
     print("Connecting to ", iobtBaseURL)
 
- 
-    return iobtHub;
-
+    return iobtHub
 
 
 def main():
 
-
     hub = LoraTXRX("7020_server", "COM9", "http://localhost:7020")
-   
 
     hub.start()
 
-    hub.listen_on_Lora()
+    hub.radio_loop_RX()
 
 
 if __name__ == '__main__':

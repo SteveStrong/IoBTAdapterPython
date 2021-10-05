@@ -3,7 +3,7 @@ from loratxrx import LoraTXRX
 
 def main():
     
-    hub = LoraTXRX("7020_server", "COM8", "http://localhost:7020")
+    hub = LoraTXRX("7020_server", "COM9", "http://localhost:7020")
       
 
     hub.start()
