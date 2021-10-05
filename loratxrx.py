@@ -47,18 +47,16 @@ def LoraTXRX(panid, port, iobtBaseURL: str):
 
     def sendItemsUntilEmpty():
         items_sent = 0
-        yield F"items sent => {items_sent}"
         empty = itemsToSend.empty()
         while not empty:
             item = itemsToSend.get()
-            yield "Q Ready => " + item.tx
             item.send()
-            yield "Q Sent=> " + item.tx
-            time.sleep(2)
             items_sent += 1
-            yield F"items sent => {items_sent}"
+            yield F"{items_sent} Sent=> " + item.tx
+            time.sleep(.01)
             empty = itemsToSend.empty()
-        return "Done"
+        return
+
 
 
     class SimpleClientHubConnector:
@@ -200,8 +198,7 @@ def LoraTXRX(panid, port, iobtBaseURL: str):
                         time.sleep(.01)
 
                 gen = sendItemsUntilEmpty()
-                result = next(gen)
-                while(result):
+                while(not itemsToSend.empty()):
                     result = next(gen)
                     print(result)
 
@@ -240,7 +237,7 @@ def LoraTXRX(panid, port, iobtBaseURL: str):
 
         def connection_made(self, transport):
             print("-------------------------------")
-            print("connection made")
+            print("LoraReceive connection made")
             self.transport = transport
             self.send_cmd('sys get ver')
             self.send_cmd('mac pause')
@@ -281,7 +278,7 @@ def LoraTXRX(panid, port, iobtBaseURL: str):
         def connection_lost(self, exc):
             if exc:
                 print(exc)
-            print("port closed")
+            print("LoraReceive port closed")
             print("-------------------------------")
 
         def send_cmd(self, cmd, delay=.05):
@@ -292,7 +289,7 @@ def LoraTXRX(panid, port, iobtBaseURL: str):
 
         def connection_made(self, transport):
             print("-------------------------------")
-            print("connection made")
+            print("LoraTransmit connection made")
             self.transport = transport
             self.send_cmd("sys set pindig GPIO11 0")
             self.send_cmd('sys get ver')
@@ -311,7 +308,7 @@ def LoraTXRX(panid, port, iobtBaseURL: str):
         def connection_lost(self, exc):
             if exc:
                 print(exc)
-            print("port closed")
+            print("LoraTransmit port closed")
             print("-------------------------------")
 
         def tx(self, message):
