@@ -13,6 +13,7 @@ from serial.threaded import LineReader, ReaderThread
 from signalrcore.hub_connection_builder import HubConnectionBuilder
 from signalrcore.protocol.messagepack_protocol import MessagePackHubProtocol
 
+#  https://github.com/pyserial/pyserial
 
 # sys set pindig GPIO10 1 (turns on blue LED)
 # sys set pindig GPIO10 0 (turns off blue LED)
