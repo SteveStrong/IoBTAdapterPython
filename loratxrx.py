@@ -52,8 +52,8 @@ def LoraTXRX(panid, port, iobtBaseURL: str):
             item = itemsToSend.get()
             item.send()
             items_sent += 1
+            time.sleep(3.01)
             yield F"{items_sent} Sent=> " + item.tx
-            time.sleep(.01)
             empty = itemsToSend.empty()
         return
 
