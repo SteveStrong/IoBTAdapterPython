@@ -172,6 +172,22 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
                 while(True):
                     time.sleep(.01)
 
+
+
+        def run(self):
+            self.ping(F"Lora radio is running on {port}")
+            while(itemsToSend.empty()):
+                open_port = serial.Serial(port, baudrate=57600)
+                with ReaderThread(open_port, LoraReceive) as protocol:
+                    protocol.turn_on_blue_light()
+                    while(itemsToSend.empty()):
+                        time.sleep(.01)
+
+                gen = sendQueuedItems()
+                while(not itemsToSend.empty()):
+                    result = next(gen)
+                    print(result)
+
         def stop(self):
             if (self.hub_connection):
                 self.hub_connection.stop()
@@ -179,6 +195,8 @@ def LoraTXRX(panid, port, iobtBaseURL:str):
         def shutdown(self):
             if (self.hub_connection):
                 self.hub_connection.stop()
+
+
 
 
     iobtHub = SimpleClientHubConnector(iobtBaseURL)
