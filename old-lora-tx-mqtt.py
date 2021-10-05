@@ -7,7 +7,7 @@ import argparse
 from serial.threaded import LineReader, ReaderThread
 
 import paho.mqtt.client as mqtt
-import radio_sender as radio
+# import radio_sender as radio
 
 # Vars =======================
 mqtt_topic="iobt/lora/tx"
@@ -71,7 +71,7 @@ def on_message(client, userdata, msg):
     ser = serial.Serial(radio_port, baudrate=57600)
     message = msg.payload.decode()
     print(message)
-    with ReaderThread(ser, radio.LoraTransmit) as protocol:
+    with ReaderThread(ser, LoraTransmit) as protocol:
         protocol.tx(message)
 
 

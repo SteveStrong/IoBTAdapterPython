@@ -1,7 +1,9 @@
 import logging
+import json
 import sys
 from typing import Any
 import time
+
 
 import serial
 from serial.threaded import LineReader, ReaderThread
@@ -11,176 +13,176 @@ from signalrcore.hub_connection_builder import HubConnectionBuilder
 from signalrcore.protocol.messagepack_protocol import MessagePackHubProtocol
 
 
-#iobtBaseURL = "http://centralmodel"
-#iobtBaseURL = "https://iobtweb.azurewebsites.net"
-iobtBaseURL = "http://localhost:6020"
 
-logger = logging.getLogger('LoraReceive')
-logger.setLevel(logging.DEBUG)  # set logger level
-consoleHandler = logging.StreamHandler(sys.stdout)
-logger.addHandler(consoleHandler)
+def LoraTXRX(port, iobtBaseURL:str):
 
-class SimpleClientHubConnector:
-    azureURL: str
-    hub_connection: Any = None
+    logger = logging.getLogger('LoraReceive')
+    logger.setLevel(logging.DEBUG)  # set logger level
+    consoleHandler = logging.StreamHandler(sys.stdout)
+    logger.addHandler(consoleHandler)
 
-    def __init__(self, url: str) -> None:
-        self.azureURL = url
-        self.initialize()
+    class SimpleClientHubConnector:
+        squireURL: str
+        hub_connection: Any = None
 
-    def initialize(self):
-        hubUrl = f"{self.azureURL}/serverHub"
-        if (self.hub_connection is not None):
-            self.hub_connection.stop()
+        def __init__(self, url: str) -> None:
+            self.squireURL = url
+            self.initialize()
 
-        # WARNING!!! signalr logging.DEBUG blocks execution of voice commands in voiceAssistant project.
-        if (self.hub_connection is None):
-            self.hub_connection = HubConnectionBuilder()\
-                .with_url(hubUrl)\
-                .configure_logging(logging.INFO)\
-                .with_automatic_reconnect({
-                    "type": "raw",
-                    "keep_alive_interval": 60,
-                    "reconnect_interval": 30,
-                    "max_attempts": 5
-                }).build()
-            self.hub_connection.on_open(lambda: print(
-                "connection opened and handshake received ready to send messages"))
-            self.hub_connection.on_close(lambda: print("connection closed"))
+        def initialize(self):
+            hubUrl = f"{self.squireURL}/serverHub"
+            if (self.hub_connection is not None):
+                self.hub_connection.stop()
 
-    def start(self):
-        try:
-            self.hub_connection.start()
-            time.sleep(1)
-            self.hub_connection.on("Pong", self.receive_json)
-            self.hub_connection.on("ActionStatus", self.receive_json)
-            self.hub_connection.on("RX", self.receive_json)
-            self.hub_connection.on("TX", self.receive_json)
+            # WARNING!!! signalr logging.DEBUG blocks execution of voice commands in voiceAssistant project.
+            if (self.hub_connection is None):
+                self.hub_connection = HubConnectionBuilder()\
+                    .with_url(hubUrl)\
+                    .configure_logging(logging.INFO)\
+                    .with_automatic_reconnect({
+                        "type": "raw",
+                        "keep_alive_interval": 60,
+                        "reconnect_interval": 30,
+                        "max_attempts": 5
+                    }).build()
 
-        except:
-            print(f"client hub connector exception")
-            raise
+                self.hub_connection.on_open(lambda: print("connection opened and handshake received"))
+                self.hub_connection.on_close(lambda: print("connection closed"))
 
-    def receive_json(self, pong):
-        print("")
-        print(f"data={pong[0]}")
+        def start(self):
+            try:
+                self.hub_connection.start()
+                time.sleep(1)
+                self.hub_connection.on("Pong", self.receive_PONGjson)
+                self.hub_connection.on("ActionStatus", self.receive_ASjson)
+                self.hub_connection.on("RX", self.receive_RXjson)
+                self.hub_connection.on("TX", self.receive_TXjson)
 
-    def ping(self, msg: str):
-        try:
-            logger.debug(f"Send Ping msg={msg}")
-            self.hub_connection.send('Ping', [msg])
-        except:
-            print(f"Error ${sys.exc_info()[0]}")
-            return []
+            except:
+                print(f"client hub connector exception")
+                raise
 
-    def RX(self, rx: str):
-        try:
-            logger.debug(f"Send RX={rx}")
-            self.hub_connection.send('RX', [rx])
-        except:
-            print(f"Error ${sys.exc_info()[0]}")
-            return []
+        def receive_PONGjson(self, pong):
+            print("")
+            print(f"pong={pong[0]}")
 
-    def stop(self):
-        if (self.hub_connection):
-            self.hub_connection.stop()
+        def receive_ASjson(self, data):
+            print("ActionStatus: receive_ASjson....")
+            print(json.dumps(data, indent=3, sort_keys=True))
 
-    def shutdown(self):
-        if (self.hub_connection):
-            self.hub_connection.stop()
+        def receive_RXjson(self, data):
+            print("RX: receive_RXjson....")
+            print(json.dumps(data, indent=3, sort_keys=True))
 
+        def receive_TXjson(self, data):
+            print("TX: receive_TXjson....")
+            print(json.dumps(data, indent=3, sort_keys=True))
 
+        def ping(self, msg: str):
+            try:
+                logger.debug(f"Send Ping msg={msg}")
+                self.hub_connection.send('Ping', [msg])
+            except:
+                print(f"Error ${sys.exc_info()[0]}")
+                return []
 
-class MessagePublisher():
-    iobtHub = None
-    def init(self):
-         if ( self.iobtHub is None):
-            self.iobtHub = SimpleClientHubConnector(iobtBaseURL)
-            self.iobtHub.start()
-            print("hub is ready to receive from lora")
-            self.iobtHub.ping("ready to recieve RX")
+        def RX(self, rx: str):
+            try:
+                logger.debug(f"Sending to server RX={rx}")
+                self.hub_connection.send('RX', [rx])
+            except:
+                print(f"Error ${sys.exc_info()[0]}")
+                return []
 
-    def publish(self, message):
-        if ( self.iobtHub is None):
-            print("Must start signalr hub")
-            return
+        def stop(self):
+            if (self.hub_connection):
+                self.hub_connection.stop()
 
-        self.iobtHub.RX(message)
+        def shutdown(self):
+            if (self.hub_connection):
+                self.hub_connection.stop()
 
 
-# https://www.crowdsupply.com/ronoth/lostik
+    iobtHub = SimpleClientHubConnector(iobtBaseURL)
+    iobtHub.start()
 
-class LoraReceive(LineReader):
-    signalrClient = None 
+     
 
-    def connection_made(self, transport):
-        print("connection made")
-        self.transport = transport
-        self.send_cmd('sys get ver')
-        self.send_cmd('mac pause')
-        self.send_cmd('radio set pwr 10')
-        self.send_cmd('radio rx 0')
-        self.send_cmd("sys set pindig GPIO10 0")
-        if (self.signalrClient is None ):
-            self.signalrClient = MessagePublisher()
-            self.signalrClient.init()
+    # https://www.crowdsupply.com/ronoth/lostik
 
+    class LoraReceive(LineReader):
 
-    def handle_line(self, data):
-        # print('handling line {0}'.format(data))
-        if data == "ok" or data == 'busy':
-            return
-        if data == "radio_err":
+        def connection_made(self, transport):
+            print("-------------------------------")
+            print("connection made")
+            self.transport = transport
+            self.send_cmd('sys get ver')
+            self.send_cmd('mac pause')
+            self.send_cmd('radio set pwr 10')
             self.send_cmd('radio rx 0')
-            return
-        if 'RN2903' in data or '4294967245' in data:
-            print('skipping line because data = {0}'.format(data))
-            return
+            self.send_cmd("sys set pindig GPIO10 0")
 
-        self.send_cmd("sys set pindig GPIO10 1", delay=0)
+        def turn_on_blue_light(self):
+            # print("'''''''''''''''''''''''''''''''''")
+            self.send_cmd("sys set pindig GPIO10 1") #turn on blue
 
-        # Get Hex Data
-        #print('getting message data with split " ", 1 [1]')
-        message = data.split("  ", 1)[1]
-        #print("Hex : %s" % message)
-
-        # Convert to UTF-8
-        message_txt = bytes.fromhex(message).decode('utf-8').strip()
-        #print('sending {0} to signalrClient'.format(data))
-        #print("Txt : %s" % message_txt)
-
-        if (self.signalrClient is None ):
-            self.signalrClient = MessagePublisher()
-            self.signalrClient.init()
-
-        self.signalrClient.publish(message_txt)
-
-        time.sleep(.1)
-        self.send_cmd("sys set pindig GPIO10 0", delay=1)
-        self.send_cmd('radio rx 0')
-
-    def connection_lost(self, exc):
-        if exc:
-            print(exc)
-        print("closing port ")
-
-    def send_cmd(self, cmd, delay=.01):
-        self.transport.write(('%s\r\n' % cmd).encode('UTF-8'))
-        time.sleep(delay)
+        def turn_off_blue_light(self):
+            self.send_cmd("sys set pindig GPIO10 0") #turn off blue
 
 
+        def handle_line(self, data):
+            if data == "ok" or data == 'busy':
+                return
+            if data == "radio_err":
+                self.send_cmd('radio rx 0')
+                return
+            if 'RN2903' in data or '4294967245' in data:
+                print(F'skipping line because data = {data}')
+                return
 
+            print(F'LoraReceive: handling line {data}')
+            #self.send_cmd("sys set pindig GPIO10 1", delay=0)
+
+            # Get Hex Data
+            #print('getting message data with split " ", 1 [1]')
+            message = data.split("  ", 1)[1]
+            #print("Hex : %s" % message)
+
+            # Convert to UTF-8
+            message_txt = bytes.fromhex(message).decode('utf-8').strip()
+            iobtHub.RX(message_txt)
+            self.send_cmd('radio rx 0')
+
+        def connection_lost(self, exc):
+            if exc:
+                print(exc)
+            print("port closed")
+            print("-------------------------------")
+
+        def send_cmd(self, cmd, delay=.01):
+            self.transport.write(('%s\r\n' % cmd).encode('UTF-8'))
+            time.sleep(delay)
+
+    open_port = serial.Serial(port, baudrate=57600)
+    with ReaderThread(open_port, LoraReceive) as protocol:
+        protocol.turn_on_blue_light()
+        while(True):
+            time.sleep(.01) 
+
+            
 
 
 
 def main():
 
-    tx_port = "COM5"
-    ser = serial.Serial(tx_port, baudrate=57600)
-    with ReaderThread(ser, LoraReceive) as protocol:
-        while(True):
-            #time.sleep(1)  # Sleep for 1 seconds
-            pass
+
+    #iobtBaseURL = "http://centralmodel"
+    #iobtBaseURL = "https://iobtweb.azurewebsites.net"
+    iobtBaseURL = "http://localhost:7020"
+
+    LoraTXRX("COM9",iobtBaseURL)
+
+   
 
 
 if __name__ == '__main__':
