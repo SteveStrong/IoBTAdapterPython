@@ -1,0 +1,18 @@
+version: '3'
+services:
+  centralmodel:
+    container_name: centralmodel
+    image: iobtassets.azurecr.io/centralmodel:v4.6.1
+    ports:
+      - 80:80
+      - 8000:80
+  offline-map-tiles:
+    container_name: offline-map-tiles
+    image: iobtassets.azurecr.io/offline-map-tiles:maples-field-airport
+    ports:
+      - 8080:8080
+  simsignalrposition:
+    container_name: simsignalrposition
+    image: iobtassets.azurecr.io/simsignalrposition:v4.6.3
+    depends_on:
+      - centralmodel
