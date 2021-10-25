@@ -19,7 +19,7 @@ CMD python3 -m IoBTAdapterPython.mqttToIoBTListener.py
 # docker run -it iobtbridge /bin/bash
 # az login
 # az acr login --name iobtassets
-# docker tag iobtbridge iobtassets.azurecr.io/iobtbridge:latest
-# docker push iobtassets.azurecr.io/iobtbridge:latest
+# docker tag iobtbridge iobtassets.azurecr.io/iobtbridge:v4.6.3
+# docker push iobtassets.azurecr.io/iobtbridge:v4.6.3
 #
 # From the IoBT docker compose git repository, use docker-compose.iobtbridge.yml

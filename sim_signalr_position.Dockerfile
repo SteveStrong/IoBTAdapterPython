@@ -15,8 +15,10 @@ COPY . ./IoBTAdapterPython
 CMD python3 -m IoBTAdapterPython.sim_signalr_position.py
 
 # From IoBTAdapterPython folder:
-# docker build -t sim_signalr_position -f sim_signalr_position.Dockerfile  .
-# docker run -it sim_signalr_position /bin/bash
+# docker build -t simsignalrposition -f sim_signalr_position.Dockerfile  .
+# docker run -it simsignalrposition /bin/bash
+# docker tag simsignalrposition iobtassets.azurecr.io/simsignalrposition:v4.6.3
+# docker push iobtassets.azurecr.io/simsignalrposition:v4.6.3
 # docker-compose up -d
 # docker-compose down
 
