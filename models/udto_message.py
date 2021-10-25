@@ -4,7 +4,7 @@ from enum import Enum
 import uuid
 from datetime import datetime
 
-sourceGUID = f"{uuid.uuid4()}"
+# sourceGUID = f"{uuid.uuid4()}"
 
 
 class Objective(Enum):
@@ -22,8 +22,7 @@ class UDTO_Base:
     def __init__(self, properties):
         now = datetime.now()
         self.timeStamp = now.isoformat()
-        self.sourceGuid = sourceGUID
-        self.panId = "PAN1"
+        #self.sourceGuid = sourceGUID
         self.override(properties)
         self.setUdtoTopic()
 

@@ -1,7 +1,8 @@
 from .models.udto_message import UDTO_Position
 import time
-import sys
-import signal
+import uuid
+from random import seed
+from random import randint
 
 import turfpy
 from turfpy.measurement import destination
@@ -15,8 +16,8 @@ from .iobtServerRealtime import IoBTClientHubConnector
 #  https://pypi.org/project/turfpy/
 #  https://github.com/omanges/turfpy/blob/master/measurements.md
 
-iobtBaseURL = "http://centralmodelapi"
-iobtBaseURL = "https://iobtweb.azurewebsites.net"
+iobtBaseURL = "http://centralmodel"
+# iobtBaseURL = "https://iobtsquire1.azurewebsites.net"
 
 
 def infinite_sequence():
@@ -26,31 +27,39 @@ def infinite_sequence():
         num += 1
 
 
-def circle_sequence(dist):
+def circle_sequence(dist, bear, bear_delta):
     origin = Feature(geometry=Point([-75.343, 39.984]))
     distance = dist
-    bearing = 80
+    bearing = bear
     options = {'units': 'km'}
     while True:
         result = destination(origin, distance, bearing, options)
         coord = result.geometry.coordinates
         yield coord
         origin = Feature(geometry=Point(coord))
-        bearing += 10
+        bearing += bear_delta
 
 
 def main():
+
+    # seed random number generator
+    seed(1)
+
     iobtHub = IoBTClientHubConnector(iobtBaseURL)
 
     iobtHub.start()
 
     iobtHub.ping("Simulation starting")
 
-    gen1 = circle_sequence(0.05)
-    gen2 = circle_sequence(0.15)
+    gen1 = circle_sequence(0.05, randint(10, 80), randint(1, 10))
+    uuid1 = f"{uuid.uuid4()}"
+    gen2 = circle_sequence(0.10, randint(80, 130), randint(1, 10))
+    uuid2 = f"{uuid.uuid4()}"
+    time.sleep(randint(10, 60))
     while(True):
-        result = next(gen2)
+        result = next(gen1)
         payload = {
+            'sourceGuid': uuid1,
             'panId': 'Steve',
             'lat': result[1],
             'lng': result[0],
@@ -59,9 +68,11 @@ def main():
 
         pos = UDTO_Position(payload)
         iobtHub.position(pos)
+        print(payload)
 
-        result = next(gen1)
+        result = next(gen2)
         payload = {
+            'sourceGuid': uuid2,
             'panId': 'Greg',
             'lat': result[1],
             'lng': result[0],

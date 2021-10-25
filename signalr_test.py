@@ -2,7 +2,6 @@ import sys
 import time
 import signal
 import logging
-from .wrappers.MQTTWrapper import MQTTtoIoBTWrapper
 from .iobtServerRealtime import IoBTClientHubConnector
 from .iobtServerRest import IobtServerRest
 
@@ -11,14 +10,14 @@ logger.setLevel(logging.DEBUG)  # set logger level
 consoleHandler = logging.StreamHandler(sys.stdout)
 logger.addHandler(consoleHandler)
 
-# iobtBaseURL = "https://iobtweb.azurewebsites.net"
-iobtBaseURL = "http://centralmodelapi"
+# iobtBaseURL = "https://iobtsquire2.azurewebsites.net"
+iobtBaseURL = "http://centralmodel"
 
 
 def main():
     logger.debug(f"Start of main")
     # print(f"Start of main")
-    iobtHub = ClientHubConnector(iobtBaseURL)
+    iobtHub = IoBTClientHubConnector(iobtBaseURL)
     iobtHub.start()
     print(f"Started iobtHub")
 

@@ -1,0 +1,17 @@
+version: '3'
+
+# docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.13.4
+# docker build -t lasearchapi -f Dockerfile  .
+
+                # docker run -d  -p 7010:80 centralmodel:latest
+                # docker run -d  -p 7020:80 centralmodel:latest
+
+services:
+  squire7010:
+    image: centralmodel:latest
+    ports:
+      - '7010:80'
+  squire7020:
+    image: centralmodel:latest
+    ports:
+      - '7020:80'

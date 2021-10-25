@@ -8,15 +8,15 @@ EXPOSE 8080
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
-# Run the application:Ad    
+# Run the application:
 RUN mkdir IoBTAdapterPython
 COPY . ./IoBTAdapterPython
 
-CMD python3 -m IoBTAdapterPython.sim_signalr_position.py
+CMD python3 -m IoBTAdapterPython.squire_signalr_bridge.py
 
 # From IoBTAdapterPython folder:
-# docker build -t sim_signalr_position -f sim_signalr_position.Dockerfile  .
-# docker run -it sim_signalr_position /bin/bash
+# docker build -t signalr_bridge -f squire_signalr.Dockerfile  .
+# docker run -it signalr_bridge /bin/bash
 # docker-compose up -d
 # docker-compose down
 
